@@ -2,6 +2,7 @@
 moonscript = require "moonscript"
 util = require "moonscript.util"
 lfs = require "lfs"
+argparse = require "argparse"
 
 -- :(
 export registeredServices = {}
@@ -10,16 +11,16 @@ export registeredServices = {}
 -- Importing service files.
 ---
 
-for fileName in lfs.dir "services"
+for fileName in lfs.dir "data/services"
 	switch fileName
 		when ".", ".."
 			continue
 
-	fileName = "services/" .. fileName
+	fileName = "data/services/" .. fileName
 
 	func, reason = moonscript.loadfile fileName
 	if func
-		helpers = require "service_helpers"
+		helpers = require "services.service_helpers"
 		helpers.registeredServices = {}
 
 		util.setfenv func, helpers
@@ -38,7 +39,7 @@ for fileName in lfs.dir "services"
 -- Importing configuration.
 --
 
-helpers = require "config_helpers"
+helpers = require "services.config_helpers"
 
 func, reason = moonscript.loadfile "config.cfg"
 
@@ -50,7 +51,7 @@ if func
 else
 	error reason, 0
 
-if root and root.__class == require("config_helpers").Root
+if root and root.__class == require("services.config_helpers").Root
 	root\print!
 else
 	error "could not load configuration (returned item must be root object)", 0
