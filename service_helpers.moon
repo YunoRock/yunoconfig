@@ -19,6 +19,8 @@ Depends = class
 	new: (name, opt) =>
 		@name = name
 
+		@optional = opt.optional or false
+
 	__tostring: => "<Depends, #{@name}>"
 
 Service = class

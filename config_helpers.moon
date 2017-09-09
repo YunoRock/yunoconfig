@@ -107,6 +107,9 @@ Service = class
 
 		for d in *ref.depends
 			-- Services not configured.
+			if d.optional
+				continue
+
 			unless @depends[d.name]
 				return "missing dependency"
 
@@ -195,7 +198,10 @@ Service = class
 			for _ = 1, indent+1
 				io.write "  "
 
-			io.write "\027[33m-", d.name, "\027[00m  "
+			if d.optional
+				io.write "\027[35m≃", d.name, "\027[00m  "
+			else
+				io.write "\027[33m-", d.name, "\027[00m  "
 
 			for i = d.name\len!, 17 - indent * 2
 				io.write "·"
