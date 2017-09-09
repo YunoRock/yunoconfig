@@ -48,9 +48,9 @@ arg = do
 -- Importing configuration.
 ---
 
-configuration = require "services.configuration"
+Configuration = require "services.configuration"
 
-configuration = configuration "config.cfg"
+configuration = Configuration.fromFileName "config.cfg"
 
 if arg.print
 	configuration\print!
