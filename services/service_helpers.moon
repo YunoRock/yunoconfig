@@ -30,6 +30,10 @@ Service = class
 		@depends = {}
 		@provides = {}
 
+		-- Custom configuration code, that can be used in @\generate.
+		-- Can be used to create configuration files from templates or other things like that.
+		@configure = opt.configure
+
 		for e in *opt
 			if e.__class == Depends
 				table.insert @depends, e

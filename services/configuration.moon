@@ -1,6 +1,8 @@
 
 moonscript = require "moonscript"
 util = require "moonscript.util"
+loadkit = require "loadkit"
+etlua = require "etlua"
 
 _M = {}
 
@@ -91,6 +93,19 @@ Domain = class
 
 		for domain in *@domains
 			domain\print i+1
+
+	generate: =>
+		print "Starting generation for #{@\getDomain!}"
+		for s in *@services
+			if s\isBroken!
+				print "Not generating configuration for #{s\getDomain! or ''}/#{s.name}"
+				print " ... reason: #{s\isBroken!}"
+
+				continue
+
+			s\generate!
+		for d in *@domains
+			d\generate!
 
 Root = class extends Domain
 	new: (opt) =>
@@ -242,6 +257,36 @@ Service = class
 
 	getDomain: =>
 		@parent\getDomain!
+
+	generate: =>
+		print "Generating configuration for #{@\getDomain! or ''}/#{@name}"
+
+		serviceReference = registeredServices[@name]
+
+		if serviceReference.configure
+			serviceReference.configure self
+
+	writeTemplate: (name, destination, templateEnvironment) =>
+		print "... writing #{destination}"
+
+		templateFile = io.open name, "r"
+
+		unless templateFile
+			loader = loadkit.make_loader "ept", nil,
+				"./data/services/#{@name}/?.lua"
+
+			templateFileName = loader name
+
+			templateFile = io.open templateFileName, "r"
+
+		templateContent = templateFile\read "*all"
+		templateFile\close!
+
+		template = assert etlua.compile templateContent
+
+		file = io.open destination, "w"
+		file\write template templateEnvironment or {service: self}
+		file\close!
 
 	__tostring: =>
 		"<Service: #{@name}, #{@\getDomain!}>"

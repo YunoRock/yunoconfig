@@ -1,0 +1,5 @@
+
+<% for _, user in ipairs(service:getUsers()) do %>
+  - <%-user.name%> on domain <%-user:getDomain()%>
+<% end %>
+

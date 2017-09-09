@@ -16,11 +16,21 @@ for fileName in lfs.dir "data/services"
 		when ".", ".."
 			continue
 
+	if not fileName\match "%.moon$"
+		continue
+
 	fileName = "data/services/" .. fileName
 
 	func, reason = moonscript.loadfile fileName
 	if func
 		helpers = require "services.service_helpers"
+		helpers.print = print
+		helpers.table = table
+		helpers.string = string
+		helpers.io = io
+		helpers.tostring = tostring
+		helpers.os = os
+		helpers.templates = templates
 		helpers.registeredServices = {}
 
 		util.setfenv func, helpers
@@ -41,7 +51,8 @@ for fileName in lfs.dir "data/services"
 
 arg = do
 	parser = with argparse "services", "Centralized configuration management tool."
-		\command "print", "Prints the current configuration tree."
+		\command "print",     "Prints the current configuration tree."
+		\command "generate",  "Generates the configuration files for all the registered services."
 	parser\parse!
 
 ---
@@ -54,4 +65,6 @@ configuration = Configuration.fromFileName "config.cfg"
 
 if arg.print
 	configuration\print!
+elseif arg.generate
+	configuration\generate!
 
