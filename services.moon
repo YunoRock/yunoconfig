@@ -53,5 +53,5 @@ else
 if root and root.__class == require("config_helpers").Root
 	root\print!
 else
-	error "could not load configuration (last item must be root object)", 0
+	error "could not load configuration (returned item must be root object)", 0
 
