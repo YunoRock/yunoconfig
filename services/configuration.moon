@@ -46,6 +46,20 @@ Domain = class
 
 	-- FIXME: Service ID model is just plain broken and stupid.
 	getServiceById: (id) =>
+		domain, service = id\match "([^/]*)%/(.*)"
+
+--		print "Getting #{id}", domain, service
+
+		if domain == @name or (domain == "" and not @parent)
+			for s in *@services
+				if s.name == service
+					return s
+		elseif @parent
+			return @parent\getServiceById id
+
+		if true
+			return nil
+
 		origin, name = id\match "([^.]*)%.(.*)"
 
 		if origin == "domain"
