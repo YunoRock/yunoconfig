@@ -36,23 +36,22 @@ for fileName in lfs.dir "data/services"
 		error reason, 0
 
 ---
+-- CLI parsing
+---
+
+arg = do
+	parser = with argparse "services", "Centralized configuration management tool."
+		\command "print", "Prints the current configuration tree."
+	parser\parse!
+
+---
 -- Importing configuration.
---
+---
 
-helpers = require "services.config_helpers"
+configuration = require "services.configuration"
 
-func, reason = moonscript.loadfile "config.cfg"
+configuration = configuration "config.cfg"
 
-local root
-
-if func
-	util.setfenv func, helpers
-	root = func!
-else
-	error reason, 0
-
-if root and root.__class == require("services.config_helpers").Root
-	root\print!
-else
-	error "could not load configuration (returned item must be root object)", 0
+if arg.print
+	configuration\print!
 
