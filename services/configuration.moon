@@ -119,24 +119,24 @@ Root = class extends Domain
 			d\print!
 
 Service = class
+	@registeredServices: {}
+	@register = (name, reference) ->
+		@@registeredServices[name] = reference
+
 	new: (name, opt) =>
 		@name = name
 
+		unless @@registeredServices[name]
+			error "unrecognized service '#{name}'"
+
+		@reference = @@registeredServices[name]
+
 		@domain = opt.domain
 
-		@depends = {}
-
-		ref = registeredServices[@name]
-		unless ref
-			error "no such service has been defined: #{@name}", 0
-
-		for d in *ref.depends
-			@depends[d.name] = opt[d.name]
+		@depends = {d.name, opt[d.name] for d in *@reference.depends}
 
 	isBroken: =>
-		ref = registeredServices[@name]
-
-		for d in *ref.depends
+		for d in *@reference.depends
 			-- Services not configured.
 			if d.optional
 				continue
@@ -160,9 +160,7 @@ Service = class
 		parent = @parent
 
 		for service in parent\getServices!
-			ref = registeredServices[service.name]
-
-			for d in *ref.depends
+			for d in *@reference.depends
 				dependsId = service.depends[d.name]
 
 				unless dependsId
@@ -206,16 +204,14 @@ Service = class
 
 		io.write "\n"
 
-		ref = registeredServices[@name]
-
 		users = @\getUsers!
 
 		-- This would have been a lot easier with à getUser(provider).
-		if #ref.provides > 0
+		if #@reference.provides > 0
 			for _ = 1, indent
 				io.write "  "
 
-			for p in *ref.provides
+			for p in *@reference.provides
 				io.write "  \027[32m+", p.name, "\027[00m"
 
 				providesUsers = {}
@@ -236,7 +232,7 @@ Service = class
 
 				io.write "\n"
 
-		for d in *ref.depends
+		for d in *@reference.depends
 			for _ = 1, indent+1
 				io.write "  "
 
@@ -271,17 +267,11 @@ Service = class
 	generate: =>
 		print "#{@\getDomain! or ''}/#{@name}"
 
-		serviceReference = registeredServices[@name]
-
-		if serviceReference.configure
-			serviceReference.configure self
+		if @reference.configure
+			@reference.configure self
 
 	getPortNumber: (service) =>
-		serviceReference = registeredServices[@name]
-
-		depends = serviceReference\getDepends service
-
-		return depends.portNumber
+		@reference\getDepends(service).portNumber
 
 	writeTemplate: (name, destination, templateEnvironment) =>
 		print " ... writing #{destination}"

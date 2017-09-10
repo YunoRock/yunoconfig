@@ -4,8 +4,7 @@ util = require "moonscript.util"
 lfs = require "lfs"
 argparse = require "argparse"
 
--- :(
-export registeredServices = {}
+Configuration = require "services.configuration"
 
 ---
 -- Importing service files.
@@ -37,11 +36,7 @@ for fileName in lfs.dir "data/services"
 		func!
 
 		for service in *helpers.registeredServices
-			if registeredServices[service.name]
-				error "service #{service.name} already declared."
-
-			table.insert registeredServices, service
-			registeredServices[service.name] = service
+			Configuration.Service.register service.name, service
 	else
 		error reason, 0
 
@@ -58,8 +53,6 @@ arg = do
 ---
 -- Importing configuration.
 ---
-
-Configuration = require "services.configuration"
 
 configuration = Configuration.fromFileName "config.cfg"
 
