@@ -4,6 +4,8 @@ util = require "moonscript.util"
 lfs = require "lfs"
 argparse = require "argparse"
 
+service_helpers = require "services.service_helpers"
+
 Configuration = require "services.configuration"
 
 ---
@@ -22,20 +24,29 @@ for fileName in lfs.dir "data/services"
 
 	func, reason = moonscript.loadfile fileName
 	if func
-		helpers = require "services.service_helpers"
-		helpers.print = print
-		helpers.table = table
-		helpers.string = string
-		helpers.io = io
-		helpers.tostring = tostring
-		helpers.os = os
-		helpers.templates = templates
-		helpers.registeredServices = {}
+		registeredServices = {}
+
+		helpers = {
+			provides: service_helpers.Provides
+			depends: service_helpers.Depends
+			service: (...) ->
+				service = service_helpers.Service ...
+
+				table.insert registeredServices, service
+
+			print: print
+			table: table
+			string: string
+			io: io
+			tostring: tostring
+			os: os
+			templates: templates
+		}
 
 		util.setfenv func, helpers
 		func!
 
-		for service in *helpers.registeredServices
+		for service in *registeredServices
 			Configuration.Service.register service.name, service
 	else
 		error reason, 0

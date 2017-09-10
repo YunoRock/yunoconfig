@@ -7,8 +7,6 @@
 -- The caller is responsible for setting “registeredServices” before each call.
 ---
 
-_M = {}
-
 Provides = class
 	new: (name, opt) =>
 		@name = name
@@ -50,12 +48,9 @@ Service = class
 
 	__tostring: => "<Service (reference), #{@name}>"
 
-_M.provides =  (...) -> Provides ...
-_M.depends =   (...) -> Depends ...
-_M.service =   (...) ->
-	s = Service ...
-
-	table.insert _M.registeredServices, s
-
-return _M
+{
+	:Service
+	:Provides
+	:Depends
+}
 
