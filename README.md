@@ -69,6 +69,7 @@ Most services will depend on another service in one way or another.
 To configure them, just add a field that has the name of the requirement in the service definition.
 
 ```moon
+root {
 	service nginx, {}
 
 	domain "test.example", {
@@ -76,6 +77,7 @@ To configure them, just add a field that has the name of the requirement in the 
 			php: "/nginx"
 		}
 	}
+}
 ```
 
 The syntax that describes other services is the following: `domain/service`.
