@@ -95,10 +95,9 @@ Domain = class
 			domain\print i+1
 
 	generate: =>
-		print "Starting generation for #{@\getDomain!}"
 		for s in *@services
 			if s\isBroken!
-				print "Not generating configuration for #{s\getDomain! or ''}/#{s.name}"
+				print "#{s\getDomain! or ''}/#{s.name} -- not generating"
 				print " ... reason: #{s\isBroken!}"
 
 				continue
@@ -270,7 +269,7 @@ Service = class
 		@parent\getDomain!
 
 	generate: =>
-		print "Generating configuration for #{@\getDomain! or ''}/#{@name}"
+		print "#{@\getDomain! or ''}/#{@name}"
 
 		serviceReference = registeredServices[@name]
 
@@ -285,7 +284,7 @@ Service = class
 		return depends.portNumber
 
 	writeTemplate: (name, destination, templateEnvironment) =>
-		print "... writing #{destination}"
+		print " ... writing #{destination}"
 
 		templateFile = io.open name, "r"
 
