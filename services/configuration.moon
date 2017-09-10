@@ -50,38 +50,12 @@ Domain = class
 	getServiceById: (id) =>
 		domain, service = id\match "([^/]*)%/(.*)"
 
---		print "Getting #{id}", domain, service
-
 		if domain == @name or (domain == "" and not @parent)
 			for s in *@services
 				if s.name == service
 					return s
 		elseif @parent
 			return @parent\getServiceById id
-
-		if true
-			return nil
-
-		origin, name = id\match "([^.]*)%.(.*)"
-
-		if origin == "domain"
-			for s in *@services
-				if s.name == name
-					return s
-		elseif origin == "parent"
-			if @parent
-				for s in *@parent.services
-					if s.name == name
-						return s
-		elseif origin == "root"
-			root = @parent
-			while root.parent
-				root = root.parent
-
-
-			for s in *root.services
-				if s.name == name
-					return s
 
 	print: (i = 0) =>
 		for _ = 1, i
