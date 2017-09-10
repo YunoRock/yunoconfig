@@ -13,6 +13,8 @@ Provides = class
 	new: (name, opt) =>
 		@name = name
 
+		@portNumber = opt.portNumber
+
 	__tostring: => "<Provides, #{@name}>"
 
 Depends = class
@@ -20,6 +22,7 @@ Depends = class
 		@name = name
 
 		@optional = opt.optional or false
+		@portNumber = opt.portNumber
 
 	__tostring: => "<Depends, #{@name}>"
 
@@ -39,6 +42,11 @@ Service = class
 				table.insert @depends, e
 			elseif e.__class == Provides
 				table.insert @provides, e
+
+	getDepends: (name) =>
+		for d in *@depends
+			if d.name == name
+				return d
 
 	__tostring: => "<Service (reference), #{@name}>"
 

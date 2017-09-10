@@ -156,7 +156,7 @@ Service = class
 	getServiceById: (id) =>
 		@parent\getServiceById id
 
-	getUsers: =>
+	getUsers: (provideId) =>
 		users = {}
 		parent = @parent
 
@@ -169,12 +169,23 @@ Service = class
 				unless dependsId
 					continue
 
+				if provideId and d.name != provideId
+					continue
+
 				s = service\getServiceById dependsId
 
 				if s == self
 					table.insert users, service
 
 		users
+
+	getRootDomain: =>
+		parent = @parent or self
+
+		while parent.parent
+			parent = parent.parent
+
+		return parent
 
 	print: (indent = 0) =>
 		for _ = 1, indent
@@ -266,6 +277,13 @@ Service = class
 		if serviceReference.configure
 			serviceReference.configure self
 
+	getPortNumber: (service) =>
+		serviceReference = registeredServices[@name]
+
+		depends = serviceReference\getDepends service
+
+		return depends.portNumber
+
 	writeTemplate: (name, destination, templateEnvironment) =>
 		print "... writing #{destination}"
 
@@ -273,7 +291,7 @@ Service = class
 
 		unless templateFile
 			loader = loadkit.make_loader "ept", nil,
-				"./data/services/#{@name}/?.lua"
+				"./data/services/#{@name}/?.lua;./data/services/?.lua"
 
 			templateFileName = loader name
 

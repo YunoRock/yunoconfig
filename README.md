@@ -1,4 +1,8 @@
 
+This tool is designed to be a common configuration interface.
+
+## Dependencies
+
 ```sh
 luarocks install moonscript
 luarocks install etlua

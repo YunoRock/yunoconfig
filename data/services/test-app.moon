@@ -1,6 +1,8 @@
 
 service "test-app", {
-	depends "http", {}
+	depends "http", {
+		portNumber: 6666
+	}
 	depends "php", {}
 	depends "ldap", {}
 }

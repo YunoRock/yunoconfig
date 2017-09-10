@@ -1,0 +1,96 @@
+
+worker_processes  1;
+
+worker_rlimit_nofile 1024;
+events {
+	worker_connections  800;
+}
+
+http {
+	include       mime.types;
+	default_type  application/octet-stream;
+	index         index.html index.htm;
+
+	fastcgi_param HTTP_PROXY "";
+
+	keepalive_timeout  65;
+
+	server_tokens off;
+
+	# HTTP -> HTTPS, for every single service provided.
+<%for _, user in ipairs(service:getUsers()) do%>
+	server {
+		listen       80;
+		listen       [::]:80;
+		server_name  <%-user:getDomain()%>;
+
+		location /.well-known/acme-challenge {
+			alias /htdocs/challenges/;
+			location ~ /.well-known/acme-challenge/(.*) {
+				add_header Content-Type application/jose+json;
+			}
+		}
+
+		location / {
+			rewrite  ^ https://$server_name$request_uri? permanent;
+		}
+	}
+<%end%>
+
+<% for _, user in ipairs(service:getUsers("www")) do %>
+	server {
+		listen       443;
+		listen       [::]:443;
+		server_name  <%-user:getDomain()%>;
+
+		ssl                  on;
+		ssl_certificate      /etc/ssl/le/chained-<%-service:getRootDomain():getDomain()%>.pem;
+		ssl_certificate_key  /etc/ssl/le/<%-service:getRootDomain():getDomain()%>.key;
+
+		ssl_session_timeout  5m;
+		ssl_session_cache    shared:SSL:1m;
+
+		ssl_ciphers  HIGH:!aNULL:!MD5:!RC4;
+		ssl_prefer_server_ciphers   on;
+
+		location /.well-known/acme-challenge {
+			alias /htdocs/challenges/;
+			location ~ /.well-known/acme-challenge/(.*) {
+				add_header Content-Type application/jose+json;
+			}
+		}
+
+		location / {
+			root /srv/http/<%-user:getDomain()%>
+		}
+	}
+<%end%>
+<%for _, user in ipairs(service:getUsers("http")) do %>
+	server {
+		listen       443;
+		listen       [::]:443;
+		server_name  <%-user:getDomain()%>;
+
+		ssl                  on;
+		ssl_certificate      /etc/ssl/le/chained-<%-service:getRootDomain():getDomain()%>.pem;
+		ssl_certificate_key  /etc/ssl/le/<%-service:getRootDomain():getDomain()%>.key;
+
+		ssl_session_timeout  5m;
+		ssl_session_cache    shared:SSL:1m;
+
+		ssl_ciphers  HIGH:!aNULL:!MD5:!RC4;
+		ssl_prefer_server_ciphers   on;
+		location / {
+			proxy_pass   http://localhost:<%-user:getPortNumber("http")%>/;
+		}
+
+		location /.well-known/acme-challenge {
+			alias /htdocs/challenges/;
+			location ~ /.well-known/acme-challenge/(.*) {
+				add_header Content-Type application/jose+json;
+			}
+		}
+	}
+<%end%>
+}
+
