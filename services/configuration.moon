@@ -191,32 +191,6 @@ Service = class
 
 		users = @\getUsers!
 
-		-- This would have been a lot easier with à getUser(provider).
-		if #@reference.provides > 0
-			for _ = 1, indent
-				io.write "  "
-
-			for p in *@reference.provides
-				io.write "  \027[32m+", p.name, "\027[00m"
-
-				providesUsers = {}
-				for user in *users
-					id = user.depends[p.name]
-
-					alreadyInUsers = false
-					for u in *providesUsers
-						if u == user\getDomain! or u == user.name
-							alreadyInUsers = true
-							break
-
-					if id and user\getServiceById(id) == self and not alreadyInUsers
-						table.insert providesUsers, user\getDomain! or user.name
-
-				if #providesUsers > 0
-					io.write " (", table.concat(providesUsers, ", "), ")"
-
-				io.write "\n"
-
 		for d in *@reference.depends
 			for _ = 1, indent+1
 				io.write "  "
@@ -247,6 +221,32 @@ Service = class
 				io.write "  INVALID SERVICE ID"
 
 			io.write "\n"
+
+		-- This would have been a lot easier with à getUser(provider).
+		if #@reference.provides > 0
+			for _ = 1, indent
+				io.write "  "
+
+			for p in *@reference.provides
+				io.write "  \027[32m+", p.name, "\027[00m"
+
+				providesUsers = {}
+				for user in *users
+					id = user.depends[p.name]
+
+					alreadyInUsers = false
+					for u in *providesUsers
+						if u == user\getDomain! or u == user.name
+							alreadyInUsers = true
+							break
+
+					if id and user\getServiceById(id) == self and not alreadyInUsers
+						table.insert providesUsers, user\getDomain! or user.name
+
+				if #providesUsers > 0
+					io.write " (", table.concat(providesUsers, ", "), ")"
+
+				io.write "\n"
 
 	getDomain: =>
 		@parent\getDomain!
