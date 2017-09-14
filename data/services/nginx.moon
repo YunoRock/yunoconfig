@@ -5,7 +5,7 @@ service "nginx", {
 	provides "php", {}
 	depends "http", {
 		optional: true
-		portNumber: 80
+		publicPorts: {80, 443}
 	}
 
 	configure: =>

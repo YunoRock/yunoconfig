@@ -84,6 +84,8 @@ Root = class extends Domain
 	new: (opt) =>
 		super "{{ROOT}}", opt
 
+		@lastLocalPortUsed = 6666
+
 	getDomain: => nil
 
 	print: =>
@@ -91,6 +93,15 @@ Root = class extends Domain
 			s\print!
 		for d in *@domains
 			d\print!
+
+	getFreeLocalPort: (service) =>
+		while true
+			@lastLocalPortUsed += 1
+
+			-- FIXME: Check it’s being saved for another service.
+			-- FIXME: If it’s not, save it.
+
+			return @lastLocalPortUsed
 
 Service = class
 	@registeredServices: {}
@@ -218,6 +229,9 @@ Service = class
 			for i = d.name\len!, 17 - indent * 2
 				io.write "·"
 
+			for port in @\getPortNumbers d.name
+				io.write "  :", port
+
 			-- A mandatory option is missing.
 			unless @depends[d.name]
 				io.write "  UNSET\n"
@@ -226,8 +240,7 @@ Service = class
 			service = @\getServiceById @depends[d.name]
 
 			if service
-				io.write "  "
-				io.write service.name
+				io.write "  ", service.name
 				io.write " "
 				io.write "(#{service\getDomain! or "---"})"
 			else
@@ -244,8 +257,28 @@ Service = class
 		if @reference.configure
 			@reference.configure self
 
-	getPortNumber: (service) =>
-		@reference\getDepends(service).portNumber
+	isPublic: (service) =>
+		return @depends[service] == nil
+
+	getPortNumbers: (service) =>
+		if @\isBroken!
+			return ->
+
+		if @\isPublic service -- not piped, using public, default ports
+			coroutine.wrap ->
+				if service
+					for port in *@reference\getDepends(service).publicPorts
+						coroutine.yield port
+				else
+					for provides in *@reference.provides
+						for port in *provides.publicPorts
+							coroutine.yield port
+		else -- piped, using local, arbitrary port
+			coroutine.wrap ->
+				for port in *({@\getCachedPort! or @\getRootDomain!\getFreeLocalPort self})
+					coroutine.yield port
+
+	getCachedPort: => -- FIXME: NOT IMPLEMENTED
 
 	writeTemplate: (name, destination, templateEnvironment) =>
 		print " ... writing #{destination}"

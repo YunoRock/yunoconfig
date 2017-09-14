@@ -11,8 +11,6 @@ Provides = class
 	new: (name, opt) =>
 		@name = name
 
-		@portNumber = opt.portNumber
-
 	__tostring: => "<Provides, #{@name}>"
 
 Depends = class
@@ -20,7 +18,8 @@ Depends = class
 		@name = name
 
 		@optional = opt.optional or false
-		@portNumber = opt.portNumber
+
+		@publicPorts = opt.publicPorts or {}
 
 	__tostring: => "<Depends, #{@name}>"
 
@@ -45,6 +44,11 @@ Service = class
 		for d in *@depends
 			if d.name == name
 				return d
+
+	getProvides: (name) =>
+		for p in *@provides
+			if p.name == name
+				return p
 
 	__tostring: => "<Service (reference), #{@name}>"
 

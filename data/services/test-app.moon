@@ -1,7 +1,8 @@
 
 service "test-app", {
 	depends "http", {
-		portNumber: 6666
+		optional: true
+		publicPorts: {80}
 	}
 	depends "php", {}
 	depends "ldap", {}
