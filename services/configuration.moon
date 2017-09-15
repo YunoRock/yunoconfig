@@ -3,6 +3,7 @@ moonscript = require "moonscript"
 util = require "moonscript.util"
 loadkit = require "loadkit"
 etlua = require "etlua"
+colors = require "term.colors"
 
 _M = {}
 
@@ -195,12 +196,12 @@ Service = class
 			for _ = 1, indent+1
 				io.write "  "
 
-			if d.optional
-				io.write "\027[35m≃", d.name, "\027[00m  "
+			if d.optional and not @depends[d.name]
+				io.write colors.magenta table.concat {"⊟ ", d.name, "  "}
 			else
-				io.write "\027[33m-", d.name, "\027[00m  "
+				io.write colors.yellow table.concat {"⊟ ", d.name, "  "}
 
-			for i = d.name\len!, 17 - indent * 2
+			for i = d.name\len!, 16 - indent * 2
 				io.write "·"
 
 			for port in @\getPortNumbers d.name
@@ -208,7 +209,11 @@ Service = class
 
 			-- A mandatory option is missing.
 			unless @depends[d.name]
-				io.write "  UNSET\n"
+				if d.optional
+					io.write "  OPTION UNSET\n"
+				else
+					io.write "  UNSET\n"
+
 				continue
 
 			service = @\getServiceById @depends[d.name]
@@ -228,7 +233,7 @@ Service = class
 				io.write "  "
 
 			for p in *@reference.provides
-				io.write "  \027[32m+", p.name, "\027[00m"
+				io.write colors.green table.concat {"  ⊞ ", p.name}
 
 				providesUsers = {}
 				for user in *users
