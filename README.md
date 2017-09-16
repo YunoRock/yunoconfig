@@ -83,6 +83,43 @@ root {
 The syntax that describes other services is the following: `domain/service`.
 If the service is configured at the root of the tree (and therefor not in any domain), the `domain` part can simply be left blank.
 
+## Service files
+
+Service files are files that describe… a service.
+
+They mostly define what tokens they provide or depend on and the code to run in order to generate the service’s configuration.
+
+```moon
+service "nginx", {
+	-- Generated tokens.
+	provides "http", {}
+	provides "php", {}
+
+	-- Required tokens.
+	depends "http", {
+		-- Not configuring a source may not be an issue if “optional”.
+		optional: true
+
+		-- What ports to request if the token is not provided.
+		-- Typically, public services will use ports if not “piped” through
+		-- another dæmon.
+		publicPorts: {80, 443}
+	}
+
+	-- Configuration generation comes here.
+	-- You may import any Lua libraries you wish, but you’ll get errors
+	-- and crashes if they are missing.
+	configure: =>
+		os.execute "mkdir -p /etc/nginx"
+
+		-- First parameter is the template to load. Second one is the file
+		-- that will be generated using that template.
+		-- Templates are .ept files (plain etlua files), usually stored next
+		-- to the service files.
+		@\writeTemplate "nginx", "/etc/nginx/#{@\getDomain! or "@"}-config"
+}
+```
+
 ## Configuration troubleshooting
 
 A `print` command is available from the tool’s CLI.
