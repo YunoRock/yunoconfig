@@ -87,6 +87,8 @@ Root = class extends Domain
 
 		@lastLocalPortUsed = 6666
 
+		@rootDirectory = "/"
+
 	getDomain: => nil
 
 	print: =>
@@ -162,7 +164,16 @@ Service = class
 
 		users
 
+	-- FIXME: Should return the high-level domain, but getConfigurationRoot?
 	getRootDomain: =>
+		parent = @parent or self
+
+		while parent.parent
+			parent = parent.parent
+
+		return parent
+
+	getConfigurationRoot: =>
 		parent = @parent or self
 
 		while parent.parent
@@ -286,6 +297,14 @@ Service = class
 	getCachedPort: => -- FIXME: NOT IMPLEMENTED
 
 	writeTemplate: (name, destination, templateEnvironment) =>
+		destination = @\getConfigurationRoot!.rootDirectory .. "/" .. destination
+
+		do
+			m = destination\match("/[^/]+$")
+
+			if m
+				os.execute "mkdir -p '#{destination\sub 1, destination\len! - m\len!}'"
+
 		print " ... writing #{destination}"
 
 		templateFile = io.open name, "r"

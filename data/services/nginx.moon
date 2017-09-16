@@ -9,8 +9,6 @@ service "nginx", {
 	}
 
 	configure: =>
-		os.execute "mkdir -p test-cfg"
-
-		@\writeTemplate "nginx", "test-cfg/nginx.cfg"
+		@\writeTemplate "nginx", "etc/nginx.cfg"
 }
 

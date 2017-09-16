@@ -59,6 +59,8 @@ arg = do
 	parser = with argparse "services", "Centralized configuration management tool."
 		\command "print",     "Prints the current configuration tree."
 		\command "generate",  "Generates the configuration files for all the registered services."
+		with \option "-r --root",    "Sets the root of the configuration tree.", "test-cfg"
+			\count 1
 	parser\parse!
 
 ---
@@ -70,5 +72,7 @@ configuration = Configuration.fromFileName "config.cfg"
 if arg.print
 	configuration\print!
 elseif arg.generate
+	configuration.rootDirectory = arg.root
+
 	configuration\generate!
 
