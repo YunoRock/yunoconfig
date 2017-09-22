@@ -55,7 +55,6 @@ Domain = class
 				for service in domain\getServices!
 					coroutine.yield service
 
-	-- FIXME: Service ID model is just plain broken and stupid.
 	getServiceById: (id) =>
 		domain, service = id\match "([^/]*)%/(.*)"
 
