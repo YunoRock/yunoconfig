@@ -28,6 +28,13 @@ Domain = class
 
 				table.insert @domains, e
 
+	finalize: =>
+		for service in *@services
+			service\finalize!
+
+		for domain in *@domains
+			domain\finalize!
+
 	getDomain: =>
 		domain = @domain or @name
 
@@ -123,6 +130,22 @@ Service = class
 
 		@depends = {d.name, opt[d.name] for d in *@reference.depends}
 
+		@portNumbers = {}
+
+		for name, value in pairs (opt.portNumbers or {})
+			switch type(value)
+				when "table"
+					@portNumbers[name] = value
+				when "number"
+					@portNumbers[name] = {value}
+				else
+					print "configuration error: #{self.name} has invalid portNumber for #{name}"
+					print " ... using default values"
+
+	finalize: =>
+		for depend in *@reference.depends
+			@portNumbers[depend.name] or= [port for port in @\getDefaultPortNumbers depend.name]
+
 	isBroken: =>
 		for d in *@reference.depends
 			-- Services not configured.
@@ -215,7 +238,7 @@ Service = class
 			for i = d.name\len!, 16 - indent * 2
 				io.write "·"
 
-			for port in @\getPortNumbers d.name
+			for port in *@portNumbers[d.name]
 				io.write "  :", port
 
 			-- A mandatory option is missing.
@@ -276,7 +299,7 @@ Service = class
 	isPublic: (service) =>
 		return @depends[service] == nil
 
-	getPortNumbers: (service) =>
+	getDefaultPortNumbers: (service) =>
 		if @\isBroken!
 			return ->
 
@@ -291,7 +314,7 @@ Service = class
 							coroutine.yield port
 		else -- piped, using local, arbitrary port
 			coroutine.wrap ->
-				for port in *({@\getCachedPort! or @\getRootDomain!\getFreeLocalPort self})
+				for port in *({@\getCachedPort! or @\getConfigurationRoot!\getFreeLocalPort self})
 					coroutine.yield port
 
 	getCachedPort: => -- FIXME: NOT IMPLEMENTED
@@ -350,6 +373,8 @@ _M.fromFileName = (filename = "config.cfg") ->
 
 	unless root or root.__class == Root
 		error "could not load configuration (returned item must be root object)", 0
+
+	root\finalize!
 
 	root
 
