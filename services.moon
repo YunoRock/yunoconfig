@@ -61,6 +61,8 @@ arg = do
 		\command "generate",  "Generates the configuration files for all the registered services."
 		with \option "-r --root",    "Sets the root of the configuration tree.", "test-cfg"
 			\count 1
+		with \option "-c --cache",   "Sets the path to the cache to read and save.", "/var/cache/services"
+			\count 1
 	parser\parse!
 
 ---

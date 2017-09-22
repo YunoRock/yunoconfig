@@ -81,7 +81,7 @@ http {
 		ssl_ciphers  HIGH:!aNULL:!MD5:!RC4;
 		ssl_prefer_server_ciphers   on;
 		location / {
-			proxy_pass   http://localhost:<%-user:getPortNumbers("http")()%>/;
+			proxy_pass   http://localhost:<%-user.portNumbers["http"][1]%>/;
 		}
 
 		location /.well-known/acme-challenge {

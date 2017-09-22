@@ -4,6 +4,7 @@ util = require "moonscript.util"
 loadkit = require "loadkit"
 etlua = require "etlua"
 colors = require "term.colors"
+serpent = require "serpent"
 
 _M = {}
 
@@ -96,6 +97,8 @@ Root = class extends Domain
 
 		@rootDirectory = "/"
 
+		@cacheDirectoryPath = nil -- Will be set in services.moon.
+
 	getDomain: => nil
 
 	print: =>
@@ -143,8 +146,51 @@ Service = class
 					print " ... using default values"
 
 	finalize: =>
+		cache = @\loadCache! or {
+			portNumbers: {}
+		}
+
 		for depend in *@reference.depends
+			@portNumbers[depend.name] or= cache.portNumbers[depend.name]
 			@portNumbers[depend.name] or= [port for port in @\getDefaultPortNumbers depend.name]
+
+	getCacheFilePath: =>
+		root = @\getConfigurationRoot!
+
+		cacheDirectoryPath = root.cacheDirectoryPath or ".services-cache"
+		cacheFilePath = "#{cacheDirectoryPath}/#{@\getDomain! or "@"}.#{@name}.serpent"
+
+		cacheFilePath, cacheDirectoryPath
+
+	loadCache: =>
+		cacheFilePath, cacheDirectoryPath = @\getCacheFilePath!
+
+		file = io.open cacheFilePath, "r"
+
+		unless file
+			return
+
+		content = file\read "*all"
+
+		success, value = serpent.load content
+
+		if success
+			return value
+		else
+			return nil, value
+
+	saveCache: =>
+		cacheFilePath, cacheDirectoryPath = @\getCacheFilePath!
+
+		os.execute "mkdir -p '#{cacheDirectoryPath}'"
+
+		file = io.open cacheFilePath, "w"
+
+		file\write serpent.dump {
+			portNumbers: @portNumbers
+		}
+
+		file\close!
 
 	isBroken: =>
 		for d in *@reference.depends
@@ -295,6 +341,8 @@ Service = class
 
 		if @reference.configure
 			@reference.configure self
+
+		@\saveCache!
 
 	isPublic: (service) =>
 		return @depends[service] == nil
