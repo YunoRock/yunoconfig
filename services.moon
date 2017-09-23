@@ -69,7 +69,8 @@ arg = do
 -- Importing configuration.
 ---
 
-configuration = Configuration.fromFileName "config.cfg"
+configuration = with Configuration.fromFileName "config.cfg"
+	.cacheDirectoryPath = arg.cache
 
 if arg.print
 	configuration\print!
