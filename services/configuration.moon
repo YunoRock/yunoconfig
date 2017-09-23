@@ -179,12 +179,12 @@ Service = class
 					print " ... using default values"
 
 	finalize: =>
-		cache = @\loadCache! or {
+		@cache = @\loadCache! or {
 			portNumbers: {}
 		}
 
 		for depend in *@reference.depends
-			@portNumbers[depend.name] or= cache.portNumbers[depend.name]
+			@portNumbers[depend.name] or= @cache.portNumbers[depend.name]
 			@portNumbers[depend.name] or= [port for port in @\getDefaultPortNumbers depend.name]
 
 	getCacheFilePath: =>
@@ -219,9 +219,9 @@ Service = class
 
 		file = io.open cacheFilePath, "w"
 
-		file\write serpent.dump {
-			portNumbers: @portNumbers
-		}
+		@cache.portNumbers = @portNumbers
+
+		file\write serpent.dump @cache
 
 		file\close!
 
