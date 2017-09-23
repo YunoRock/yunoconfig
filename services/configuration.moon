@@ -164,7 +164,7 @@ Service = class
 
 		@domain = opt.domain
 
-		@depends = {d.name, opt[d.name] for d in *@reference.depends}
+		@consumes = {d.name, opt[d.name] for d in *@reference.consumes}
 
 		@portNumbers = {}
 
@@ -183,9 +183,9 @@ Service = class
 			portNumbers: {}
 		}
 
-		for depend in *@reference.depends
-			@portNumbers[depend.name] or= @cache.portNumbers[depend.name]
-			@portNumbers[depend.name] or= [port for port in @\getDefaultPortNumbers depend.name]
+		for consume in *@reference.consumes
+			@portNumbers[consume.name] or= @cache.portNumbers[consume.name]
+			@portNumbers[consume.name] or= [port for port in @\getDefaultPortNumbers consume.name]
 
 	getCacheFilePath: =>
 		root = @\getConfigurationRoot!
@@ -226,18 +226,18 @@ Service = class
 		file\close!
 
 	isBroken: =>
-		for d in *@reference.depends
+		for d in *@reference.consumes
 			-- Services not configured.
 			if d.optional
 				continue
 
-			unless @depends[d.name]
-				return "missing dependency"
+			unless @consumes[d.name]
+				return "missing consumeency"
 
 		-- Services configured, but invalid IDs.
-			depend = @\getServiceById @depends[d.name]
+			consume = @\getServiceById @consumes[d.name]
 
-			unless depend
+			unless consume
 				return "invalid service id"
 
 		false
@@ -245,21 +245,21 @@ Service = class
 	getServiceById: (id) =>
 		@parent\getServiceById id
 
-	getUsers: (provideId) =>
+	getConsumers: (provideId) =>
 		users = {}
 		parent = @parent
 
 		for service in parent\getServices!
-			for d in *@reference.depends
-				dependsId = service.depends[d.name]
+			for d in *@reference.consumes
+				consumesId = service.consumes[d.name]
 
-				unless dependsId
+				unless consumesId
 					continue
 
 				if provideId and d.name != provideId
 					continue
 
-				s = service\getServiceById dependsId
+				s = service\getServiceById consumesId
 
 				if s == self
 					table.insert users, service
@@ -303,13 +303,13 @@ Service = class
 
 		io.write "\n"
 
-		users = @\getUsers!
+		users = @\getConsumers!
 
-		for d in *@reference.depends
+		for d in *@reference.consumes
 			for _ = 1, indent+1
 				io.write "  "
 
-			if d.optional and not @depends[d.name]
+			if d.optional and not @consumes[d.name]
 				io.write colors.magenta table.concat {"⊟ ", d.name, "  "}
 			else
 				io.write colors.yellow table.concat {"⊟ ", d.name, "  "}
@@ -321,7 +321,7 @@ Service = class
 				io.write "  :", port
 
 			-- A mandatory option is missing.
-			unless @depends[d.name]
+			unless @consumes[d.name]
 				if d.optional
 					io.write "  OPTION UNSET\n"
 				else
@@ -329,7 +329,7 @@ Service = class
 
 				continue
 
-			service = @\getServiceById @depends[d.name]
+			service = @\getServiceById @consumes[d.name]
 
 			if service
 				io.write "  ", service.name
@@ -350,7 +350,7 @@ Service = class
 
 				providesUsers = {}
 				for user in *users
-					id = user.depends[p.name]
+					id = user.consumes[p.name]
 
 					alreadyInUsers = false
 					for u in *providesUsers
@@ -378,7 +378,7 @@ Service = class
 		@\saveCache!
 
 	isPublic: (service) =>
-		return @depends[service] == nil
+		return @consumes[service] == nil
 
 	getDefaultPortNumbers: (service) =>
 		if @\isBroken!
@@ -387,7 +387,7 @@ Service = class
 		if @\isPublic service -- not piped, using public, default ports
 			coroutine.wrap ->
 				if service
-					for port in *@reference\getDepends(service).publicPorts
+					for port in *@reference\getConsumes(service).publicPorts
 						coroutine.yield port
 				else
 					for provides in *@reference.provides

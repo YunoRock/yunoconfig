@@ -13,7 +13,7 @@ Provides = class
 
 	__tostring: => "<Provides, #{@name}>"
 
-Depends = class
+Consumes = class
 	new: (name, opt) =>
 		@name = name
 
@@ -21,13 +21,13 @@ Depends = class
 
 		@publicPorts = opt.publicPorts or {}
 
-	__tostring: => "<Depends, #{@name}>"
+	__tostring: => "<Consumes, #{@name}>"
 
 Service = class
 	new: (name, opt) =>
 		@name = name
 
-		@depends = {}
+		@consumes = {}
 		@provides = {}
 
 		-- Custom configuration code, that can be used in @\generate.
@@ -35,13 +35,13 @@ Service = class
 		@configure = opt.configure
 
 		for e in *opt
-			if e.__class == Depends
-				table.insert @depends, e
+			if e.__class == Consumes
+				table.insert @consumes, e
 			elseif e.__class == Provides
 				table.insert @provides, e
 
-	getDepends: (name) =>
-		for d in *@depends
+	getConsumes: (name) =>
+		for d in *@consumes
 			if d.name == name
 				return d
 
@@ -55,6 +55,6 @@ Service = class
 {
 	:Service
 	:Provides
-	:Depends
+	:Consumes
 }
 

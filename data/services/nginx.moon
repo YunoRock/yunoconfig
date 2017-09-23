@@ -3,7 +3,7 @@ service "nginx", {
 	provides "http", {}
 	provides "www", {}
 	provides "php", {}
-	depends "http", {
+	consumes "http", {
 		optional: true
 		publicPorts: {80, 443}
 	}

@@ -28,7 +28,7 @@ for fileName in lfs.dir "data/services"
 
 		helpers = {
 			provides: service_helpers.Provides
-			depends: service_helpers.Depends
+			consumes: service_helpers.Consumes
 			service: (...) ->
 				service = service_helpers.Service ...
 

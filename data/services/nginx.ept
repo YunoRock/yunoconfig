@@ -18,7 +18,7 @@ http {
 	server_tokens off;
 
 	# HTTP -> HTTPS, for every single service provided.
-<%for _, user in ipairs(service:getUsers()) do%>
+<%for _, user in ipairs(service:getConsumers()) do%>
 	server {
 		listen       80;
 		listen       [::]:80;
@@ -37,7 +37,7 @@ http {
 	}
 <%end%>
 
-<% for _, user in ipairs(service:getUsers("www")) do %>
+<% for _, user in ipairs(service:getConsumers("www")) do %>
 	server {
 		listen       443;
 		listen       [::]:443;
@@ -65,7 +65,7 @@ http {
 		}
 	}
 <%end%>
-<%for _, user in ipairs(service:getUsers("http")) do %>
+<%for _, user in ipairs(service:getConsumers("http")) do %>
 	server {
 		listen       443;
 		listen       [::]:443;

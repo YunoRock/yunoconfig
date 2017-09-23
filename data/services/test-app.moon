@@ -1,10 +1,10 @@
 
 service "test-app", {
-	depends "http", {
+	consumes "http", {
 		optional: true
 		publicPorts: {80}
 	}
-	depends "php", {}
-	depends "ldap", {}
+	consumes "php", {}
+	consumes "ldap", {}
 }
 

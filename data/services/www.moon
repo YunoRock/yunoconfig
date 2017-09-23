@@ -1,5 +1,5 @@
 
 service "www", {
-	depends "www", {}
+	consumes "www", {}
 }
 
