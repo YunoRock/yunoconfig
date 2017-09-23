@@ -96,7 +96,9 @@ Root = class extends Domain
 
 		@rootDirectory = "/"
 
-		@cacheDirectoryPath = nil -- Will be set in services.moon.
+		@cacheDirectoryPath = ".services-cache" -- Will be set in services.moon.
+
+		@allCachedPorts = {}
 
 	getDomain: => nil
 
@@ -106,14 +108,46 @@ Root = class extends Domain
 		for d in *@domains
 			d\print!
 
+	finalize: =>
+		cacheDirectoryAttributes = lfs.attributes(@cacheDirectoryPath)
+			
+		if cacheDirectoryAttributes and cacheDirectoryAttributes.mode == "directory"
+			for f in lfs.dir @cacheDirectoryPath
+				if f == "." or f == ".."
+					continue
+
+				filePath = "#{@cacheDirectoryPath}/#{f}"
+				file, reason = io.open filePath, "r"
+
+				unless file
+					print "could not open #{filePath}: #{reason}"
+					continue
+
+				_, data = serpent.load file\read "*all"
+
+				file\close!
+
+				for name, ports in pairs data.portNumbers
+					for port in *ports
+						@allCachedPorts[#@allCachedPorts+1] = port
+
+						print filePath, port
+
+		Domain.finalize self
+
 	getFreeLocalPort: (service) =>
 		while true
 			@lastLocalPortUsed += 1
 
-			-- FIXME: Check it’s being saved for another service.
-			-- FIXME: If it’s not, save it.
+			portIsFree = true
+			for port in *@allCachedPorts
+				if port == @lastLocalPortUsed
+					portIsFree = false
 
-			return @lastLocalPortUsed
+					break
+
+			if portIsFree
+				return @lastLocalPortUsed
 
 Service = class
 	@registeredServices: {}
@@ -403,7 +437,7 @@ _M.Service = Service
 _M.Domain = Domain
 _M.Root = Root
 
-_M.fromFileName = (filename = "config.cfg") ->
+_M.fromFileName = (filename = "config.cfg", opt) ->
 	func, reason = moonscript.loadfile "config.cfg"
 
 	local root
@@ -420,6 +454,10 @@ _M.fromFileName = (filename = "config.cfg") ->
 
 	unless root or root.__class == Root
 		error "could not load configuration (returned item must be root object)", 0
+
+	if opt
+		if opt.cacheDirectoryPath
+			root.cacheDirectoryPath = opt.cacheDirectoryPath
 
 	root\finalize!
 
