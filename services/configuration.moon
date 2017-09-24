@@ -131,8 +131,6 @@ Root = class extends Domain
 					for port in *ports
 						@allCachedPorts[#@allCachedPorts+1] = port
 
-						print filePath, port
-
 		Domain.finalize self
 
 	getFreeLocalPort: (service) =>
