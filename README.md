@@ -24,6 +24,8 @@ luarocks install etlua
 luarocks install loadkit
 luarocks install argparse
 luarocks install luafilesystem
+luarocks install lua-term
+luarocks install serpent
 ```
 
 ## Configuration example
