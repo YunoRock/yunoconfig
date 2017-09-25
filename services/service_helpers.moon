@@ -34,6 +34,8 @@ Service = class
 		-- Can be used to create configuration files from templates or other things like that.
 		@configure = opt.configure
 
+		@service = opt.service
+
 		for e in *opt
 			if e.__class == Consumes
 				table.insert @consumes, e

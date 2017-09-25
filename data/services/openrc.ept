@@ -1,0 +1,55 @@
+#!/sbin/openrc-run
+
+description="<%-data.description or (service.name .. " running on " .. (service:getDomain() or "@"))%>"
+extra_started_commands="<%if data.reload then%> reload<%end%>"
+
+pidfile=/run/<%-service:getDomain() or ""%>/<%-service.name%>.pid
+required_files="<%-table.concat(data.requiredFiles or {}, " ")%>"
+
+depend() {
+	after<%for _, depend in ipairs(data.after or {}) do%> <%-depend%><%end%>
+}
+
+<%if data.preStart then%>
+start_pre() {
+	ebegin
+	<%-data.preStart%>
+	eend $?
+}
+<%end%>
+
+<%if data.start then%>
+start() {
+	ebegin "Starting ${SVCNAME}"
+	start-stop-daemon --background --start --exec $(which <%-data.start:gsub("%s.*", "")%>) \
+		--make-pidfile --pidfile $pidfile -- \
+		<%-data.start:gsub("^[^ ]*%s+", "")%>
+	eend $?
+}
+<%end%>
+
+<%if data.stop then%>
+stop() {
+	ebegin "Stopping ${SVCNAME}"
+	<%if data.stop:gsub(":.*", "") == "signal" then%>
+	start-stop-daemon --stop --signal <%-data.stop:gsub("^signal:", "")%> --pidfile $pidfile
+	<%else%>
+	<%-data.stop%>
+	<%end%>
+	eend $?
+}
+<%end%>
+
+<%if data.reload then%>
+reload() {
+	ebegin "Reloading ${SVCNAME} configuration"
+	<%if data.reload:gsub(":.*", "") == "signal" then%>
+	<%if data.preStart then %><%-data.preStart%> && \
+		<%end%>start-stop-daemon --signal <%-data.reload:gsub("^signal:", "")%> --pidfile $pidfile
+	<%else%>
+	<%-data.reload%>
+	<%end%>
+	eend $?
+}
+<%end%>
+

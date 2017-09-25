@@ -100,6 +100,17 @@ Root = class extends Domain
 
 		@allCachedPorts = {}
 
+		@servicesManager = opt.servicesManager or {
+			name: "openrc"
+			configure: (service, data) =>
+				service\writeTemplate "openrc",
+					"etc/init.d/services-#{service\getDomain! or '@'}.#{service.name}",
+					{
+						:data
+						:service
+					}
+		}
+
 	getDomain: => nil
 
 	print: =>
@@ -373,7 +384,23 @@ Service = class
 		if @reference.configure
 			@reference.configure self
 
+		if @reference.service
+			serviceData = @reference.service self
+
+			@\generateServicesManagerConfiguration serviceData
+
 		@\saveCache!
+
+	generateServicesManagerConfiguration: (serviceData) =>
+		print "-- placeholder generation for #{self}"
+		print "   start: #{serviceData.start}"
+
+		servicesManager = @\getConfigurationRoot!.servicesManager
+
+		unless servicesManager
+			return nil, "no services manager configured"
+
+		servicesManager\configure self, serviceData
 
 	isPublic: (service) =>
 		return @consumes[service] == nil
