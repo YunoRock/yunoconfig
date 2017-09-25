@@ -9,7 +9,8 @@ service "nginx", {
 	}
 
 	service: =>
-		configFile = "#{@\getConfigurationRoot!.rootDirectory}/etc/nginx.cfg"
+		configFile = "#{@\getConfigurationRoot!.rootDirectory}/etc/#{@\getDomain! or "@"}-nginx.cfg"
+
 		{
 			start: "nginx -c #{configFile}"
 			preStart: "nginx -t #{configFile}"
@@ -21,6 +22,6 @@ service "nginx", {
 		}
 
 	configure: =>
-		@\writeTemplate "nginx", "etc/nginx.cfg"
+		@\writeTemplate "nginx", "etc/#{@\getDomain! or "@"}-nginx.cfg"
 }
 

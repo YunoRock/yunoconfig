@@ -241,7 +241,7 @@ Service = class
 				continue
 
 			unless @consumes[d.name]
-				return "missing consumeency"
+				return "missing provider"
 
 		-- Services configured, but invalid IDs.
 			consume = @\getServiceById @consumes[d.name]
@@ -319,7 +319,7 @@ Service = class
 				io.write "  "
 
 			if d.optional and not @consumes[d.name]
-				io.write colors.magenta table.concat {"⊟ ", d.name, "  "}
+				io.write colors.blue table.concat {"⊟ ", d.name, "  "}
 			else
 				io.write colors.yellow table.concat {"⊟ ", d.name, "  "}
 
@@ -351,10 +351,10 @@ Service = class
 
 		-- This would have been a lot easier with à getUser(provider).
 		if #@reference.provides > 0
-			for _ = 1, indent
-				io.write "  "
-
 			for p in *@reference.provides
+				for _ = 1, indent
+					io.write "  "
+
 				io.write colors.green table.concat {"  ⊞ ", p.name}
 
 				providesUsers = {}
