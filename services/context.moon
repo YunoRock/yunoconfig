@@ -1,4 +1,5 @@
 
+serpent = require "serpent"
 moonscript = require "moonscript"
 util = require "moonscript.util"
 lfs = require "lfs"
