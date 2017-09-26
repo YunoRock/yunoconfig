@@ -119,7 +119,7 @@ class extends Object
 		unless templateFile
 			loader = loadkit.make_loader "ept", nil,
 				@context.templatesLoadPath ..
-				";./data/services/?.lua" ..
+				";./data/templates/?.lua" ..
 				";/usr/share/services/templates/#{@name}/?.lua" ..
 				";/usr/share/services/templates/?.lua"
 

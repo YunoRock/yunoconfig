@@ -3,7 +3,7 @@ service "ip-php", {
 	consumes "php", {}
 
 	configure: (context) =>
-		originDirectory = "./data/services/"
+		originDirectory = "./data"
 		destinationDirectory = "/srv/http/#{@\getDomainName! or "@"}"
 
 		@\createDirectory destinationDirectory

@@ -12,7 +12,7 @@ class
 
 		@outputDirectory = opt.outputDirectory or "/"
 		@cacheDirectory = opt.cacheDirectory or "/var/cache/services"
-		@servicesDirectory = opt.servicesDirectory or "./data/services"
+		@servicesDirectory = opt.servicesDirectory or "./data"
 		@servicesManager = opt.servicesManager or "openrc"
 
 		@definedServices = {}
