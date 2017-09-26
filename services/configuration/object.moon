@@ -24,7 +24,7 @@ class
 	print: (indentLevel = 0) =>
 		@\printIndent indentLevel
 
-		print "<#{@type}: #{@name}>, #{#@children}"
+		print "<#{@type}: #{@name}>"
 
 		for child in *@children
 			child\print indentLevel + 1
