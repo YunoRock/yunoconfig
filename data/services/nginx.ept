@@ -22,7 +22,7 @@ http {
 	server {
 		listen       80;
 		listen       [::]:80;
-		server_name  <%-user:getDomain()%>;
+		server_name  <%-user:getDomainName()%>;
 
 		location /.well-known/acme-challenge {
 			alias /htdocs/challenges/;
@@ -41,11 +41,11 @@ http {
 	server {
 		listen       443;
 		listen       [::]:443;
-		server_name  <%-user:getDomain()%>;
+		server_name  <%-user:getDomainName()%>;
 
 		ssl                  on;
-		ssl_certificate      /etc/ssl/le/chained-<%-user:getDomain()%>.pem;
-		ssl_certificate_key  /etc/ssl/le/<%-user:getDomain()%>.key;
+		ssl_certificate      /etc/ssl/le/chained-<%-user:getDomainName()%>.pem;
+		ssl_certificate_key  /etc/ssl/le/<%-user:getDomainName()%>.key;
 
 		ssl_session_timeout  5m;
 		ssl_session_cache    shared:SSL:1m;
@@ -61,7 +61,7 @@ http {
 		}
 
 		location / {
-			root /srv/http/<%-user:getDomain()%>
+			root /srv/http/<%-user:getDomainName()%>
 		}
 	}
 <%end%>
@@ -69,11 +69,11 @@ http {
 	server {
 		listen       443;
 		listen       [::]:443;
-		server_name  <%-user:getDomain()%>;
+		server_name  <%-user:getDomainName()%>;
 
 		ssl                  on;
-		ssl_certificate      /etc/ssl/le/chained-<%-user:getDomain()%>.pem;
-		ssl_certificate_key  /etc/ssl/le/<%-user:getDomain()%>.key;
+		ssl_certificate      /etc/ssl/le/chained-<%-user:getDomainName()%>.pem;
+		ssl_certificate_key  /etc/ssl/le/<%-user:getDomainName()%>.key;
 
 		ssl_session_timeout  5m;
 		ssl_session_cache    shared:SSL:1m;

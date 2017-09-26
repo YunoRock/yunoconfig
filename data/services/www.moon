@@ -2,7 +2,8 @@
 service "www", {
 	consumes "www", {}
 
-	configure: =>
-		os.execute "mkdir -p #{@\getConfigurationRoot!.rootDirectory}/srv/www/#{self\getDomain! or "@"}"
+	configure: (context) =>
+		@\createDirectory "/srv/www/#{@\getDomainName! or "@"}"
+		--os.execute "mkdir -p #{context.outputDirectory}/srv/www/#{self\getDomain! or "@"}"
 }
 

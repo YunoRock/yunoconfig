@@ -1,12 +1,12 @@
 
 service "ip-php", {
-	provides "php", {}
+	consumes "php", {}
 
-	configure: =>
+	configure: (context) =>
 		originDirectory = "./data/services/"
-		destinationDirectory = "#{@\getConfigurationRoot!.rootDirectory}/srv/http/#{@\getDomain! or "@"}"
+		destinationDirectory = "/srv/http/#{@\getDomainName! or "@"}"
 
-		os.execute "mkdir -p '#{destinationDirectory}'"
-		os.execute "cp '#{originDirectory}/ip.php' '#{destinationDirectory}/'"
+		@\createDirectory destinationDirectory
+		@\copy "#{originDirectory}/ip.php", destinationDirectory
 }
 

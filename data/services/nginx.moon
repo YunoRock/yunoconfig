@@ -8,8 +8,8 @@ service "nginx", {
 		publicPorts: {80, 443}
 	}
 
-	service: =>
-		configFile = "#{@\getConfigurationRoot!.rootDirectory}/etc/#{@\getDomain! or "@"}-nginx.cfg"
+	service: (context) =>
+		configFile = "#{context.outputDirectory}/etc/#{@\getDomainName! or "@"}-nginx.cfg"
 
 		{
 			start: "nginx -c #{configFile}"
@@ -22,6 +22,6 @@ service "nginx", {
 		}
 
 	configure: =>
-		@\writeTemplate "nginx", "etc/#{@\getDomain! or "@"}-nginx.cfg"
+		@\writeTemplate "nginx", "etc/#{@\getDomainName! or "@"}-nginx.cfg"
 }
 

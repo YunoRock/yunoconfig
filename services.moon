@@ -1,82 +1,39 @@
 
-moonscript = require "moonscript"
-util = require "moonscript.util"
-lfs = require "lfs"
 argparse = require "argparse"
 
-service_helpers = require "services.service_helpers"
-
-Configuration = require "services.configuration"
-
----
--- Importing service files.
----
-
-for fileName in lfs.dir "data/services"
-	switch fileName
-		when ".", ".."
-			continue
-
-	if not fileName\match "%.moon$"
-		continue
-
-	fileName = "data/services/" .. fileName
-
-	func, reason = moonscript.loadfile fileName
-	if func
-		registeredServices = {}
-
-		helpers = {
-			provides: service_helpers.Provides
-			consumes: service_helpers.Consumes
-			service: (...) ->
-				service = service_helpers.Service ...
-
-				table.insert registeredServices, service
-
-			print: print
-			table: table
-			string: string
-			io: io
-			tostring: tostring
-			os: os
-			templates: templates
-		}
-
-		util.setfenv func, helpers
-		func!
-
-		for service in *registeredServices
-			Configuration.Service.register service.name, service
-	else
-		error reason, 0
-
----
--- CLI parsing
----
+Context = require "services.context"
 
 arg = do
-	parser = with argparse "services", "Centralized configuration management tool."
-		\command "print",     "Prints the current configuration tree."
-		\command "generate",  "Generates the configuration files for all the registered services."
-		with \option "-r --root",    "Sets the root of the configuration tree.", "test-cfg"
+	parser = with argparse "services", "Centralized configuiration management tool."
+		\command "print",    "Prints the current configuration tree."
+		\command "generate", "Generates the configuration files for all the registered services."
+		\command "print-services", "Prints a list of available and configurable services."
+
+		with \option "-r --root",  "Sets the root of the configuration tree.", "/"
 			\count 1
-		with \option "-c --cache",   "Sets the path to the cache to read and save.", "/var/cache/services"
+		with \option "-c --cache", "Sets the path to the cache used to generate the configuration.", "/var/cache/services"
 			\count 1
+		with \option "-S --services-dir", "Sets the path to the directory containing the service definition files.", "/usr/share/services"
+			\count 1
+
 	parser\parse!
 
----
--- Importing configuration.
----
+with Context!
+	.outputDirectory = arg.root
+	.cacheDirectory = arg.cache
+	.servicesDirectory = arg.services_dir
 
-configuration = Configuration.fromFileName "config.cfg", {
-	cacheDirectoryPath: arg.cache
-}
+	\importServices!
 
-if arg.print
-	configuration\print!
-elseif arg.generate
-	configuration.rootDirectory = arg.root
+	if arg["print-services"]
+		for service in *.definedServices
+			print service
+		os.exit 0
 
-	configuration\generate!
+	\importConfiguration!
+
+	if arg.print
+		\print!
+	elseif arg.generate
+		\generate!
 

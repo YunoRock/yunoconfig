@@ -1,9 +1,9 @@
 #!/sbin/openrc-run
 
-description="<%-data.description or (service.name .. " running on " .. (service:getDomain() or "@"))%>"
+description="<%-data.description or (service.name .. " running on " .. (service:getDomainName() or "@"))%>"
 extra_started_commands="<%if data.reload then%> reload<%end%>"
 
-pidfile=/run/<%-service:getDomain() or ""%>/<%-service.name%>.pid
+pidfile=/run/<%-service:getDomainName() or ""%>/<%-service.name%>.pid
 required_files="<%-table.concat(data.requiredFiles or {}, " ")%>"
 
 depend() {
