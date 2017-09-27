@@ -191,6 +191,17 @@ class extends Object
 
 		consumers
 
+	getRecursiveConsumers: (tagName) =>
+		consumers = {}
+
+		for consumer in *@\getConsumers tagName
+			table.insert consumers, consumer
+
+			for c in *consumer\getRecursiveConsumers tagName
+				table.insert consumers, c
+
+		consumers
+
 	print: (indentLevel = 0) =>
 		@\printIndent indentLevel
 		io.write "service: ", (colors.bright colors.white self.name), "\n"
@@ -230,6 +241,11 @@ class extends Object
 
 			io.write "\n"
 
+	providesTag: (name) =>
+		for tag in *@definition.providedTags
+			if tag.name == name
+				return tag
+
 	__tostring: =>
-		"<configuration.service: #{@name}>"
+		"<configuration.service: #{@name} on #{@\getDomainName! or "@"}>"
 

@@ -28,11 +28,67 @@ http {
 
 <% -- nginx not piped -> front code %>
 <% if not service.tagProviders["http"] then %>
+	<%
+		proxied = {}
+		publicServices = {} -- array of {tag = "tag", service = {…}}
+
+		has = function(element, array)
+			for i = 1, #array do
+				if array[i] == element then
+					return true
+				end
+			end
+
+			return false
+		end
+
+		topLevelConsumers = {}
+
+		-- Stuff we provide access to directly.
+		for _, tag in ipairs {"www", "php", "http"} do
+			topLevelConsumers[tag] = service:getConsumers(tag)
+
+			for _, consumer in ipairs(topLevelConsumers[tag]) do
+				table.insert(publicServices, {
+					tag = tag,
+					service = consumer
+				})
+			end
+		end
+
+		-- Anything accessed through proxies.
+		for _, proxy in ipairs(service:getConsumers("http")) do
+			for _, tag in ipairs {"www", "php", "http"} do
+				for _, consumer in ipairs(proxy:getConsumers(tag)) do
+					-- Ignoring proxies.
+					if not consumer:providesTag("http") then -- FIXME: That test may remove a tad too many services.
+						table.insert(publicServices, {
+							tag = tag,
+							service = consumer
+						})
+
+						proxied[consumer] = proxy
+					end
+				end
+
+				for _, subProxy in ipairs(proxy:getRecursiveConsumers("http")) do
+					for _, consumer in ipairs(subProxy:getConsumers(tag)) do
+						-- Ignoring proxies.
+						if not consumer:providesTag("http") then
+							table.insert(publicServices, {
+								tag = tag,
+								service = consumer
+							})
+
+							proxied[consumer] = proxy
+						end
+					end
+				end
+			end
+		end
+	%>
 
 	<% for _, user in ipairs(service:getConsumers()) do %>
-		<% -- FIXME: This may be another provider. `service:getServiceById(service.providers("certificate"))`? %>
-		<%service.context.definedServices.certificates.generateCertificate(service, user.parent)%>
-
 		server {
 			listen       <%- service.portNumbers["http"][1] %>;
 			listen       [::]:<%- service.portNumbers["http"][1] %>;
@@ -51,7 +107,16 @@ http {
 		}
 	<% end %>
 
-	<% for _, user in ipairs(service:getConsumers("www")) do %>
+	<% for _, pair in ipairs(publicServices) do %>
+		<% user = pair.service; tag = pair.tag %>
+
+		<%
+			-- FIXME: This may be another provider. `service:getServiceById(service.providers("certificate"))`?
+			-- FIXME: Are we not generating too many certs? What if we have a plain proxy here? (Real Life Situations™)
+		%>
+		<%service.context.definedServices.certificates.generateCertificate(service, user.parent)%>
+
+
 		server {
 			listen       <%- service.portNumbers["http"][2] %>;
 			listen       [::]:<%- service.portNumbers["http"][2] %>;
@@ -74,104 +139,42 @@ http {
 				}
 			}
 
-			location / {
-				root /srv/www/<%-user:getDomainName()%>;
-			}
-		}
-	<%end%>
-
-	<%for _, user in ipairs(service:getConsumers("http")) do %>
-		server {
-			listen       <%- service.portNumbers["http"][2] %>;
-			listen       [::]:<%- service.portNumbers["http"][2] %>;
-			server_name  <%-user:getDomainName()%> *.<%-user:getDomainName()%>;
-
-			ssl                  on;
-			ssl_certificate      /etc/yunorock/ssl/<%-user:getDomainName()%>.cert;
-			ssl_certificate_key  /etc/yunorock/ssl/<%-user:getDomainName()%>.key;
-
-			ssl_session_timeout  5m;
-			ssl_session_cache    shared:SSL:1m;
-
-			ssl_ciphers  HIGH:!aNULL:!MD5:!RC4;
-			ssl_prefer_server_ciphers   on;
-
-			location /.well-known/acme-challenge {
-				alias /htdocs/challenges/;
-				location ~ /.well-known/acme-challenge/(.*) {
-					add_header Content-Type application/jose+json;
+			<% if proxied[user] then %>
+				location / {
+					proxy_set_header Host $host;
+					proxy_next_upstream_timeout 2s;
+					proxy_pass   http://127.0.0.1:<%-proxied[user].portNumbers["http"][1]%>/;
 				}
-			}
-
-			location / {
-				proxy_set_header Host $host;
-				# proxy_bind   127.0.0.1;
-				proxy_next_upstream_timeout 2s;
-				proxy_pass   http://127.0.0.1:<%-user.portNumbers["http"][1]%>/;
-			}
-		}
-	<%end%>
-
-	<%for _, user in ipairs(service:getConsumers("php")) do %>
-		server {
-			listen       <%- service.portNumbers["http"][2] %>;
-			listen       [::]:<%- service.portNumbers["http"][2] %>;
-			server_name  <%-user:getDomainName()%>;
-			index        index.php index.html index.xhtml;
-
-			# client_max_body_size 10m;
-			# client_body_timeout 120;
-
-			ssl                  on;
-			ssl_certificate      /etc/yunorock/ssl/<%-user:getDomainName()%>.cert;
-			ssl_certificate_key  /etc/yunorock/ssl/<%-user:getDomainName()%>.key;
-
-			ssl_session_timeout  5m;
-			ssl_session_cache    shared:SSL:1m;
-
-			ssl_ciphers  HIGH:!aNULL:!MD5:!RC4;
-			ssl_prefer_server_ciphers   on;
-
-			location /.well-known/acme-challenge {
-				alias /htdocs/challenges/;
-				location ~ /.well-known/acme-challenge/(.*) {
-					add_header Content-Type application/jose+json;
+			<% elseif tag == "http" then %>
+				location / {
+					proxy_set_header Host $host;
+					proxy_next_upstream_timeout 2s;
+					proxy_pass   http://127.0.0.1:<%-user.portNumbers["http"][1]%>/;
 				}
-			}
-
-			location / {
-				root /srv/http/<%-user:getDomainName()%>;
-			}
-
-#			location ~ \.php$ {
-#					try_files      $uri $uri/ =404;
-#					# fastcgi_pass   unix:/run/php-fpm.sock;
-#					fastcgi_pass   127.0.0.1:9000;
-#					fastcgi_index  index.php;
-#					fastcgi_param  SCRIPT_FILENAME $document_root$fastcgi_script_name;
-#					include        /etc/nginx/fastcgi_params;
-#			}
-
-			location ~ [^/]\.php(/|$) {
-				root /srv/http/<%-user:getDomainName()%>;
-
-				fastcgi_split_path_info ^(.+?\.php)(/.*)$;
-				if (!-f $document_root$fastcgi_script_name) {
-					return 404;
+			<% elseif tag == "www" then %>
+				location / {
+					root /srv/www/<%-user:getDomainName()%>;
 				}
+			<% elseif tag == "php" then %>
+				location ~ [^/]\.php(/|$) {
+					root /srv/http/<%-user:getDomainName()%>;
 
-				# Mitigate https://httpoxy.org/ vulnerabilities
-				fastcgi_param HTTP_PROXY "";
+					fastcgi_split_path_info ^(.+?\.php)(/.*)$;
+					if (!-f $document_root$fastcgi_script_name) {
+						return 404;
+					}
 
-				fastcgi_pass 127.0.0.1:9000;
-				fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
-				fastcgi_index index.php;
-				include /etc/nginx/fastcgi_params;
-			}
+					# Mitigate https://httpoxy.org/ vulnerabilities
+					fastcgi_param HTTP_PROXY "";
+
+					fastcgi_pass 127.0.0.1:9000;
+					fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+					fastcgi_index index.php;
+					include /etc/nginx/fastcgi_params;
+				}
+			<% end %>
 		}
-
-	<%end%>
-
+	<% end %>
 <% -- nginx proxied %>
 <% else %>
 
@@ -195,7 +198,6 @@ http {
 
 			location / {
 				proxy_set_header Host $host;
-				# proxy_bind   127.0.0.1;
 				proxy_next_upstream_timeout 2s;
 				proxy_pass   http://127.0.0.1:<%-user.portNumbers["http"][1]%>/;
 			}
