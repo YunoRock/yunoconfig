@@ -1,5 +1,0 @@
-
-service "slapd", {
-	provides "ldap", {}
-}
-
