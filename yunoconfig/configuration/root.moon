@@ -1,5 +1,5 @@
 
-Domain = require "services.configuration.domain"
+Domain = require "yunoconfig.configuration.domain"
 
 class extends Domain
 	new: (opt) =>

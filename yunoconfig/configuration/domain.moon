@@ -1,5 +1,5 @@
 
-Object = require "services.configuration.object"
+Object = require "yunoconfig.configuration.object"
 
 class extends Object
 	new: (name, opt) =>

@@ -1,19 +1,20 @@
+#!/usr/bin/env moon
 
 argparse = require "argparse"
 
-Context = require "services.context"
+Context = require "yunoconfig.context"
 
 arg = do
-	parser = with argparse "services", "Centralized configuiration management tool."
+	parser = with argparse "yunoconfig", "Centralized configuiration management tool."
 		\command "print",    "Prints the current configuration tree."
 		\command "generate", "Generates the configuration files for all the registered services."
 		\command "print-services", "Prints a list of available and configurable services."
 
 		with \option "-r --root",  "Sets the root of the configuration tree.", "/"
 			\count 1
-		with \option "-c --cache", "Sets the path to the cache used to generate the configuration.", "/var/cache/services"
+		with \option "-c --cache", "Sets the path to the cache used to generate the configuration.", "/var/cache/yunoconfig"
 			\count 1
-		with \option "-S --services-dir", "Sets the path to the directory containing the service definition files.", "/usr/share/services"
+		with \option "-S --services-dir", "Sets the path to the directory containing the service definition files.", "/usr/share/yunoconfig"
 			\count 1
 
 	parser\parse!

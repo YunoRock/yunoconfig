@@ -1,6 +1,12 @@
 
 class
 	new: (name, opt) =>
+		for k,v in pairs opt
+			if type(k) == "number"
+				continue
+
+			self[k] = v
+
 		@name = name
 
 		@consumedTags = {}
@@ -14,9 +20,6 @@ class
 					table.insert @consumedTags, child
 				when "provides"
 					table.insert @providedTags, child
-
-		@configure = opt.configure
-		@service = opt.service
 
 	__tostring: => "<definition.service: #{@name}>"
 

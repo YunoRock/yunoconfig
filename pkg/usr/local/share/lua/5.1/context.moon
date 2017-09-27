@@ -4,8 +4,8 @@ moonscript = require "moonscript"
 util = require "moonscript.util"
 lfs = require "lfs"
 
-ServiceDefinition = require("services.definition.service")
-ConfigurationService = require("services.configuration.service")
+ServiceDefinition = require("yunoconfig.definition.service")
+ConfigurationService = require("yunoconfig.configuration.service")
 
 class
 	new: (opt) =>
@@ -71,11 +71,12 @@ class
 			util.setfenv f, {
 				service: (...) ->
 					table.insert definedServices, ServiceDefinition ...
-				consumes: require("services.definition.consumes")
-				provides: require("services.definition.provides")
+				consumes: require("yunoconfig.definition.consumes")
+				provides: require("yunoconfig.definition.provides")
 
 				:tostring, :tonumber, :print
 				:table, :os, :io, :string
+				:require
 			}
 
 			f!
@@ -92,8 +93,8 @@ class
 		f = assert moonscript.loadfile filename
 
 		util.setfenv f, {
-			root: require("services.configuration.root")
-			domain: require("services.configuration.domain")
+			root: require("yunoconfig.configuration.root")
+			domain: require("yunoconfig.configuration.domain")
 			service: (name, opt) ->
 				opt.definition = @definedServices[name]
 

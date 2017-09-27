@@ -5,7 +5,7 @@ serpent = require "serpent"
 loadkit = require "loadkit"
 etlua = require "etlua"
 
-Object = require "services.configuration.object"
+Object = require "yunoconfig.configuration.object"
 
 class extends Object
 	new: (name, opt) =>
@@ -120,8 +120,8 @@ class extends Object
 			loader = loadkit.make_loader "ept", nil,
 				@context.templatesLoadPath ..
 				";./data/templates/?.lua" ..
-				";/usr/share/services/templates/#{@name}/?.lua" ..
-				";/usr/share/services/templates/?.lua"
+				";/usr/share/yunoconfig/templates/#{@name}/?.lua" ..
+				";/usr/share/yunoconfig/templates/?.lua"
 
 			templateFileName = loader name
 
@@ -165,6 +165,9 @@ class extends Object
 	copy: (source, destination) =>
 		io.write "   copy: '#{colors.blue source}' -> '#{colors.white destination}'", "\n"
 		os.execute "cp '#{source}' #{@context.outputDirectory}/#{destination}"
+
+	message: (...) =>
+		io.write "   ", ..., "\n"
 
 	getDomainName: =>
 		@parent\getDomainName!
