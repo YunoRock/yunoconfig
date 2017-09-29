@@ -399,7 +399,16 @@ $(PACKAGE)-$(VERSION).tar.gz: distdir
 		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/provides.moon \
 		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/root.moon \
 		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/service.moon \
+		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/yunoconfig/configuration.moon \
+		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/yunoconfig/consumes.moon \
+		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/yunoconfig/context.moon \
+		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/yunoconfig/domain.moon \
+		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/yunoconfig/object.moon \
+		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/yunoconfig/provides.moon \
+		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/yunoconfig/root.moon \
+		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/yunoconfig/service.moon \
 		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/yunoconfig/certificates.moon \
+		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/yunoconfig/gitea.moon \
 		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/yunoconfig/ip-php.moon \
 		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/yunoconfig/mariadb.moon \
 		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/yunoconfig/nginx.moon \
@@ -443,7 +452,16 @@ $(PACKAGE)-$(VERSION).tar.xz: distdir
 		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/provides.moon \
 		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/root.moon \
 		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/service.moon \
+		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/yunoconfig/configuration.moon \
+		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/yunoconfig/consumes.moon \
+		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/yunoconfig/context.moon \
+		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/yunoconfig/domain.moon \
+		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/yunoconfig/object.moon \
+		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/yunoconfig/provides.moon \
+		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/yunoconfig/root.moon \
+		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/yunoconfig/service.moon \
 		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/yunoconfig/certificates.moon \
+		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/yunoconfig/gitea.moon \
 		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/yunoconfig/ip-php.moon \
 		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/yunoconfig/mariadb.moon \
 		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/yunoconfig/nginx.moon \
@@ -487,7 +505,16 @@ $(PACKAGE)-$(VERSION).tar.bz2: distdir
 		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/provides.moon \
 		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/root.moon \
 		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/service.moon \
+		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/yunoconfig/configuration.moon \
+		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/yunoconfig/consumes.moon \
+		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/yunoconfig/context.moon \
+		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/yunoconfig/domain.moon \
+		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/yunoconfig/object.moon \
+		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/yunoconfig/provides.moon \
+		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/yunoconfig/root.moon \
+		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/yunoconfig/service.moon \
 		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/yunoconfig/certificates.moon \
+		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/yunoconfig/gitea.moon \
 		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/yunoconfig/ip-php.moon \
 		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/yunoconfig/mariadb.moon \
 		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/yunoconfig/nginx.moon \
