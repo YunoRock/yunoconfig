@@ -157,7 +157,7 @@ http {
 				}
 			<% elseif tag == "php" then %>
 				location ~ [^/]\.php(/|$) {
-					root /srv/http/<%-user:getDomainName()%>;
+					root /srv/www/<%-user:getDomainName()%>;
 
 					fastcgi_split_path_info ^(.+?\.php)(/.*)$;
 					if (!-f $document_root$fastcgi_script_name) {
@@ -215,16 +215,24 @@ http {
 			# client_body_timeout 120;
 
 			location / {
-				root /srv/http/<%-user:getDomainName()%>;
+				root /srv/www/<%-user:getDomainName()%>;
 			}
 
-			location ~ \.php$ {
-					try_files      $uri $uri/ =404;
-					# fastcgi_pass   unix:/run/php-fpm.sock;
-					fastcgi_pass   127.0.0.1:9000;
-					fastcgi_index  index.php;
-					fastcgi_param  SCRIPT_FILENAME $document_root$fastcgi_script_name;
-					include        /etc/nginx/fastcgi_params;
+			location ~ [^/]\.php(/|$) {
+				root /srv/www/<%-user:getDomainName()%>;
+
+				fastcgi_split_path_info ^(.+?\.php)(/.*)$;
+				if (!-f $document_root$fastcgi_script_name) {
+					return 404;
+				}
+
+				# Mitigate https://httpoxy.org/ vulnerabilities
+				fastcgi_param HTTP_PROXY "";
+
+				fastcgi_pass 127.0.0.1:9000;
+				fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+				fastcgi_index index.php;
+				include /etc/nginx/fastcgi_params;
 			}
 		}
 

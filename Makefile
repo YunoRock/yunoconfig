@@ -16,7 +16,7 @@ LDFLAGS :=
 
 Q := @
 
-all: yunoconfig.moon yunoconfig/configuration.moon yunoconfig/configuration/domain.moon yunoconfig/configuration/object.moon yunoconfig/configuration/root.moon yunoconfig/configuration/service.moon yunoconfig/context.moon yunoconfig/definition/consumes.moon yunoconfig/definition/provides.moon yunoconfig/definition/service.moon data/certificates.moon data/ip-php.moon data/nginx.moon data/openrc.moon data/slapd.moon data/test-app.moon data/www.moon data/templates/nginx.ept data/templates/openrc.ept
+all: yunoconfig.moon yunoconfig/configuration.moon yunoconfig/configuration/domain.moon yunoconfig/configuration/object.moon yunoconfig/configuration/root.moon yunoconfig/configuration/service.moon yunoconfig/context.moon yunoconfig/definition/consumes.moon yunoconfig/definition/provides.moon yunoconfig/definition/service.moon data/certificates.moon data/ip-php.moon data/mariadb.moon data/nginx.moon data/openrc.moon data/slapd.moon data/test-app.moon data/www.moon data/templates/nginx.ept data/templates/openrc.ept
 	@:
 
 yunoconfig.moon: yunoconfig.moon
@@ -181,6 +181,19 @@ data/ip-php.moon.uninstall:
 	@echo '[01;37m  RM >    [01;37m$(SHAREDIR)/yunoconfig/ip-php.moon[00m'
 	$(Q)rm -f '$(DESTDIR)$(SHAREDIR)/yunoconfig/ip-php.moon'
 
+data/mariadb.moon:
+
+data/mariadb.moon.install: data/mariadb.moon
+	@echo '[01;31m  IN >    [01;37m$(SHAREDIR)/yunoconfig/mariadb.moon[00m'
+	$(Q)mkdir -p '$(DESTDIR)$(SHAREDIR)/yunoconfig'
+	$(Q)install -m0755 data/mariadb.moon $(DESTDIR)$(SHAREDIR)/yunoconfig/mariadb.moon
+
+data/mariadb.moon.clean:
+
+data/mariadb.moon.uninstall:
+	@echo '[01;37m  RM >    [01;37m$(SHAREDIR)/yunoconfig/mariadb.moon[00m'
+	$(Q)rm -f '$(DESTDIR)$(SHAREDIR)/yunoconfig/mariadb.moon'
+
 data/nginx.moon:
 
 data/nginx.moon.install: data/nginx.moon
@@ -287,12 +300,12 @@ $(DESTDIR)$(SHAREDIR):
 $(DESTDIR)$(INCLUDEDIR):
 	@echo '[01;35m  DIR >   [01;37m$(INCLUDEDIR)[00m'
 	$(Q)mkdir -p $(DESTDIR)$(INCLUDEDIR)
-install: subdirs.install yunoconfig.moon.install yunoconfig/configuration.moon.install yunoconfig/configuration/domain.moon.install yunoconfig/configuration/object.moon.install yunoconfig/configuration/root.moon.install yunoconfig/configuration/service.moon.install yunoconfig/context.moon.install yunoconfig/definition/consumes.moon.install yunoconfig/definition/provides.moon.install yunoconfig/definition/service.moon.install data/certificates.moon.install data/ip-php.moon.install data/nginx.moon.install data/openrc.moon.install data/slapd.moon.install data/test-app.moon.install data/www.moon.install data/templates/nginx.ept.install data/templates/openrc.ept.install
+install: subdirs.install yunoconfig.moon.install yunoconfig/configuration.moon.install yunoconfig/configuration/domain.moon.install yunoconfig/configuration/object.moon.install yunoconfig/configuration/root.moon.install yunoconfig/configuration/service.moon.install yunoconfig/context.moon.install yunoconfig/definition/consumes.moon.install yunoconfig/definition/provides.moon.install yunoconfig/definition/service.moon.install data/certificates.moon.install data/ip-php.moon.install data/mariadb.moon.install data/nginx.moon.install data/openrc.moon.install data/slapd.moon.install data/test-app.moon.install data/www.moon.install data/templates/nginx.ept.install data/templates/openrc.ept.install
 	@:
 
 subdirs.install:
 
-uninstall: subdirs.uninstall yunoconfig.moon.uninstall yunoconfig/configuration.moon.uninstall yunoconfig/configuration/domain.moon.uninstall yunoconfig/configuration/object.moon.uninstall yunoconfig/configuration/root.moon.uninstall yunoconfig/configuration/service.moon.uninstall yunoconfig/context.moon.uninstall yunoconfig/definition/consumes.moon.uninstall yunoconfig/definition/provides.moon.uninstall yunoconfig/definition/service.moon.uninstall data/certificates.moon.uninstall data/ip-php.moon.uninstall data/nginx.moon.uninstall data/openrc.moon.uninstall data/slapd.moon.uninstall data/test-app.moon.uninstall data/www.moon.uninstall data/templates/nginx.ept.uninstall data/templates/openrc.ept.uninstall
+uninstall: subdirs.uninstall yunoconfig.moon.uninstall yunoconfig/configuration.moon.uninstall yunoconfig/configuration/domain.moon.uninstall yunoconfig/configuration/object.moon.uninstall yunoconfig/configuration/root.moon.uninstall yunoconfig/configuration/service.moon.uninstall yunoconfig/context.moon.uninstall yunoconfig/definition/consumes.moon.uninstall yunoconfig/definition/provides.moon.uninstall yunoconfig/definition/service.moon.uninstall data/certificates.moon.uninstall data/ip-php.moon.uninstall data/mariadb.moon.uninstall data/nginx.moon.uninstall data/openrc.moon.uninstall data/slapd.moon.uninstall data/test-app.moon.uninstall data/www.moon.uninstall data/templates/nginx.ept.uninstall data/templates/openrc.ept.uninstall
 	@:
 
 subdirs.uninstall:
@@ -302,7 +315,7 @@ test: all subdirs subdirs.test
 
 subdirs.test:
 
-clean: yunoconfig.moon.clean yunoconfig/configuration.moon.clean yunoconfig/configuration/domain.moon.clean yunoconfig/configuration/object.moon.clean yunoconfig/configuration/root.moon.clean yunoconfig/configuration/service.moon.clean yunoconfig/context.moon.clean yunoconfig/definition/consumes.moon.clean yunoconfig/definition/provides.moon.clean yunoconfig/definition/service.moon.clean data/certificates.moon.clean data/ip-php.moon.clean data/nginx.moon.clean data/openrc.moon.clean data/slapd.moon.clean data/test-app.moon.clean data/www.moon.clean data/templates/nginx.ept.clean data/templates/openrc.ept.clean
+clean: yunoconfig.moon.clean yunoconfig/configuration.moon.clean yunoconfig/configuration/domain.moon.clean yunoconfig/configuration/object.moon.clean yunoconfig/configuration/root.moon.clean yunoconfig/configuration/service.moon.clean yunoconfig/context.moon.clean yunoconfig/definition/consumes.moon.clean yunoconfig/definition/provides.moon.clean yunoconfig/definition/service.moon.clean data/certificates.moon.clean data/ip-php.moon.clean data/mariadb.moon.clean data/nginx.moon.clean data/openrc.moon.clean data/slapd.moon.clean data/test-app.moon.clean data/www.moon.clean data/templates/nginx.ept.clean data/templates/openrc.ept.clean
 
 distclean: clean
 
@@ -319,27 +332,12 @@ $(PACKAGE)-$(VERSION).tar.gz: distdir
 	$(Q)tar czf $(PACKAGE)-$(VERSION).tar.gz \
 		$(PACKAGE)-$(VERSION)/data/certificates.moon \
 		$(PACKAGE)-$(VERSION)/data/ip-php.moon \
+		$(PACKAGE)-$(VERSION)/data/mariadb.moon \
 		$(PACKAGE)-$(VERSION)/data/nginx.moon \
 		$(PACKAGE)-$(VERSION)/data/openrc.moon \
 		$(PACKAGE)-$(VERSION)/data/slapd.moon \
 		$(PACKAGE)-$(VERSION)/data/test-app.moon \
 		$(PACKAGE)-$(VERSION)/data/www.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/configuration.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/consumes.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/context.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/domain.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/object.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/provides.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/root.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/service.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/share/lua/5.1/configuration.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/share/lua/5.1/consumes.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/share/lua/5.1/context.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/share/lua/5.1/domain.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/share/lua/5.1/object.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/share/lua/5.1/provides.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/share/lua/5.1/root.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/share/lua/5.1/service.moon \
 		$(PACKAGE)-$(VERSION)/spec/test.moon \
 		$(PACKAGE)-$(VERSION)/yunoconfig/configuration.moon \
 		$(PACKAGE)-$(VERSION)/yunoconfig/configuration/domain.moon \
@@ -361,27 +359,12 @@ $(PACKAGE)-$(VERSION).tar.xz: distdir
 	$(Q)tar cJf $(PACKAGE)-$(VERSION).tar.xz \
 		$(PACKAGE)-$(VERSION)/data/certificates.moon \
 		$(PACKAGE)-$(VERSION)/data/ip-php.moon \
+		$(PACKAGE)-$(VERSION)/data/mariadb.moon \
 		$(PACKAGE)-$(VERSION)/data/nginx.moon \
 		$(PACKAGE)-$(VERSION)/data/openrc.moon \
 		$(PACKAGE)-$(VERSION)/data/slapd.moon \
 		$(PACKAGE)-$(VERSION)/data/test-app.moon \
 		$(PACKAGE)-$(VERSION)/data/www.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/configuration.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/consumes.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/context.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/domain.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/object.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/provides.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/root.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/service.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/share/lua/5.1/configuration.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/share/lua/5.1/consumes.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/share/lua/5.1/context.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/share/lua/5.1/domain.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/share/lua/5.1/object.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/share/lua/5.1/provides.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/share/lua/5.1/root.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/share/lua/5.1/service.moon \
 		$(PACKAGE)-$(VERSION)/spec/test.moon \
 		$(PACKAGE)-$(VERSION)/yunoconfig/configuration.moon \
 		$(PACKAGE)-$(VERSION)/yunoconfig/configuration/domain.moon \
@@ -403,27 +386,12 @@ $(PACKAGE)-$(VERSION).tar.bz2: distdir
 	$(Q)tar cjf $(PACKAGE)-$(VERSION).tar.bz2 \
 		$(PACKAGE)-$(VERSION)/data/certificates.moon \
 		$(PACKAGE)-$(VERSION)/data/ip-php.moon \
+		$(PACKAGE)-$(VERSION)/data/mariadb.moon \
 		$(PACKAGE)-$(VERSION)/data/nginx.moon \
 		$(PACKAGE)-$(VERSION)/data/openrc.moon \
 		$(PACKAGE)-$(VERSION)/data/slapd.moon \
 		$(PACKAGE)-$(VERSION)/data/test-app.moon \
 		$(PACKAGE)-$(VERSION)/data/www.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/configuration.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/consumes.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/context.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/domain.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/object.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/provides.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/root.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/local/share/lua/5.1/service.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/share/lua/5.1/configuration.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/share/lua/5.1/consumes.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/share/lua/5.1/context.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/share/lua/5.1/domain.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/share/lua/5.1/object.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/share/lua/5.1/provides.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/share/lua/5.1/root.moon \
-		$(PACKAGE)-$(VERSION)/pkg/usr/share/lua/5.1/service.moon \
 		$(PACKAGE)-$(VERSION)/spec/test.moon \
 		$(PACKAGE)-$(VERSION)/yunoconfig/configuration.moon \
 		$(PACKAGE)-$(VERSION)/yunoconfig/configuration/domain.moon \

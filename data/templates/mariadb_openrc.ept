@@ -1,0 +1,53 @@
+#!/sbin/openrc-run
+
+getconf() {
+	v=$(my_print_defaults --mysqld | grep ^--$1)
+	[ -z $v ] && echo $2 || echo ${v#*=}
+}
+
+retry="60"
+extra_stopped_commands="setup"
+command="/usr/bin/mysqld_safe"
+command_args="--syslog --nowatch"
+depend() {
+	use net
+	need localmount
+}
+
+setup() {
+	ebegin "Creating a new MySQL database"
+	mysql_install_db --user=mysql --rpm
+	eend $?
+}
+
+start_pre() {
+	pidfile=$(getconf pid-file "/run/mysqld/mysqld.pid")
+	command_args="$command_args --pid-file=$pidfile"
+	required_dirs=$(getconf datadir "/var/lib/mysql")
+	if [ ! -d $required_dirs/mysql ]; then
+		eerror "Datadir '$required_dirs' is empty or invalid."
+		eerror "Run '/etc/init.d/mariadb setup' to create new database."
+	fi
+}
+
+start_post() {
+	ewaitfile 10 $(getconf socket "/run/mysqld/mysqld.sock")
+	<%
+		preStartOpts = ""
+		for _, consumer in ipairs(service:getConsumers()) do
+			-- user | password
+			name = consumer:getDomainName():gsub("%.", "_")
+			password = service.cache.passwords[tostring(consumer)]
+			preStartOpts = preStartOpts .. " '" .. name .. "' '" .. password .. "' '" .. name .. "'"
+		end
+
+		print(preStartOpts)
+	%>
+	sleep 1 # because fuck mariadb I HATE MARIADB
+	/usr/local/bin/db-handle.sh check-or-create "<%-service.cache.rootPassword%>" <%-preStartOpts%>
+}
+
+stop_pre() {
+	pidfile=$(getconf pid-file "/run/mysqld/mysqld.pid")
+}
+

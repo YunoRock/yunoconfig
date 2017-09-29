@@ -93,7 +93,6 @@ class extends Object
 
 	generate: (context) =>
 		print "<#{colors.cyan @\getId!}>"
-		@\saveCache context
 
 		if @definition.configure
 			@definition.configure self, context
@@ -102,6 +101,8 @@ class extends Object
 			serviceData = @definition.service self, context
 
 			context.definedServices[context.servicesManager]\configure context, self, serviceData
+
+		@\saveCache context
 
 	writeTemplate: (name, destination, environment) =>
 		destinationPath = @context.outputDirectory .. "/" .. destination
@@ -164,7 +165,7 @@ class extends Object
 
 	copy: (source, destination) =>
 		io.write "   copy: '#{colors.blue source}' -> '#{colors.white destination}'", "\n"
-		os.execute "cp '#{source}' #{@context.outputDirectory}/#{destination}"
+		os.execute "cp -r '#{source}' #{@context.outputDirectory}/#{destination}"
 
 	message: (...) =>
 		io.write "   ", ..., "\n"
@@ -245,6 +246,15 @@ class extends Object
 		for tag in *@definition.providedTags
 			if tag.name == name
 				return tag
+
+	getConfigurationRoot: =>
+		root = @parent
+		while root.parent
+			root = root.parent
+		root
+
+	getServiceById: (id) =>
+		@\getConfigurationRoot!\getServiceById id
 
 	__tostring: =>
 		"<configuration.service: #{@name} on #{@\getDomainName! or "@"}>"

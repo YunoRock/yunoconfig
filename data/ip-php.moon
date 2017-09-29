@@ -4,7 +4,7 @@ service "ip-php", {
 
 	configure: (context) =>
 		originDirectory = "./data"
-		destinationDirectory = "/srv/http/#{@\getDomainName! or "@"}"
+		destinationDirectory = "/srv/www/#{@\getDomainName! or "@"}"
 
 		@\createDirectory destinationDirectory
 		@\copy "#{originDirectory}/ip.php", destinationDirectory

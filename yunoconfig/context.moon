@@ -98,6 +98,10 @@ class
 			service: (name, opt) ->
 				opt.definition = @definedServices[name]
 
+				unless opt.definition
+					print "error: no definition for service '#{name}'"
+					os.exit 1
+
 				ConfigurationService name, opt
 		}
 
