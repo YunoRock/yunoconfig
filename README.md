@@ -155,18 +155,19 @@ The `generate` command (from the tool’s CLI) will generate the configuration.
 moon services.moon generate
 ```
 
-## Current implementation
+## Current implementation, Yunorock project
 
-This project is currently tested on the Alpine Linux distribution, but every part is distribution-agnostic.
+This software is part of a bigger project: Yunorock.
+The project is currently tested on the Alpine Linux distribution, but every part is distribution-agnostic.
 
 ### Core system
 
 The whole system relies on several programs:
 
-- configuration generation and templates (yunoconfig)
-- packet manager (apk)
-- service manager (openrc)
-- backups (borg)
+- configuration generation and templates: yunoconfig
+- packet manager: apk
+- service manager: openrc
+- backups: borg
 
 That's it. Everything else is optional, and these programs could be changed if you want to (protip: you don't).
 
@@ -174,7 +175,24 @@ That's it. Everything else is optional, and these programs could be changed if y
 
 - nginx (provides: http, www, php)
 - mariadb (provides: sql, mysql)
-- gitea (consumes: sql)
+- gitea (consumes: http, sql)
+
+### Convention
+
+Here the convention for the file hierarchy:
+
+  - /var/yunorock/<domain>-<service>: generated configuration files
+  - /srv/yunorock/<domain>-<service>: service data directory
+  - /usr/share/yunoconfig: description files for yunorock services
+    - /templates
+  - /etc/yunoconfig : user configuration directory (ex: for templates edition)
+    - /templates
+  - /usr/share/www : web yunorock appliances directory
+  - /run/yunorock/<domain>-<service> : openrc runtime, dedicated yunorock files
+  - /var/cache/yunorock/<domain>-<service> : service runtime cache
+  - /var/log/yunorock/<domain>-<service> : service logs
+  - /var/backups/yunorock/<domain>-<service> : backups directory
+
 
 ## Approach limitations
 
@@ -186,20 +204,119 @@ This could be circumvented in different ways, but this is not even a near proble
 In a near future, here the configuration file you could use:
 ```moon
 root {
-	service nginx, {}
-	service mariadb, {}
 
-	domain "example.com:host1", {
-		service "some-php-app", {
-			php: "/nginx"
-		}
-	}
+    -- HERE BEGIN THE NETWORK CONFIGURATION: IP, Firewall, DNS, DHCP, VPN, NAT
 
-	domain "test.example.com:host2", {
-		service "some-php-app", {
-			php: "/nginx"
-                        sql: "/mariadb"
-		}
-	}
+    ip: {
+        addresses: { 192.0.2.1/24, 2001:db8::1/64 }
+        gateway: 192.168.0.1
+    }
+
+    -- this example file is very much a work-in-progress
+    -- and should only be seen as a goal in a far distant future
+
+    -- first, let's configure the DNS
+    -- nsd will build a zone file based on its user domain names, IP and mail servers
+    service nsd, {}
+
+    -- the DHCP can be processed as this
+    -- unbound provides the tag "resolver" and you can add several resolvers
+    service dhcpd, { 
+        -- put IP addresses directly is simpler, but we want to statically
+        -- check if unbound should be configured for these systems
+        resolver: { "example.com/unbound", "test.example.com/unbound" }
+        range: { 192.0.2.50, 192.0.2.100 }
+        -- default gateway is the same as the root domain
+    }
+
+    -- radvd is a program to autoconfigure IPv6 in the LAN
+    service radvd, {
+        -- information here cannot be deduced from elsewhere un the configuration
+        iface: "vio0"
+        network: "2001:db8:0:1::/64"
+    }
+
+    service openvpn, {
+        iface: "tun0"
+
+        -- user, certificate and password are not to be generated since it is provided by the VPN service provider
+        user: "me"
+        cert: "/etc/openvpn/certificate.crt"
+        -- this also could have been "password: 'abcdef'"
+    }
+
+    -- nat service automatically configures IP forwarding, too
+    service nat, {
+        iface: "/openvpn"
+    }
+
+    -- iptables service deduces ports to open and redirect from the rest of the configuration file
+    service iptables, {}
+
+    -- END OF THE NETWORK CONFIGURATION ON THE ROOT SYSTEM
+
+    service certificate, {}
+
+    service nginx, {}
+    service mariadb, {}
+
+    service slapd, {}
+
+    -- here is the configuration for the host1 machine
+    -- in an heterogeneous network, the configuration generation should be performed on the target host
+    -- rationale: the environement (and thus directories and OS programs) may be different
+    -- example: root system has apk and openrc, host1 may have apt and systemd
+
+    domain "example.com:host1", {
+        ip: {
+            addresses: { 192.0.2.10/24, 2001:db8::10/64 }
+            -- if not defined, default gateway is the same as the root domain
+        }
+
+        service unbound, {}
+
+        service "some-php-app", {
+                php: "/nginx"
+        }
+
+        service prosody, {
+            ldap: "/slapd"
+            certificate: "/certificate"
+        }
+
+        -- here is the configuration for the host2 machine
+        -- same as host1, if the target system is not the same as the root system, the configuration should be generated directly on the target host
+        domain "test:host2", {
+            ip: {
+                addresses: { 192.0.2.20/24, 2001:db8::20/64 }
+                -- if not defined, default gateway is the same as the root domain
+            }
+
+            service "some-php-app", {
+                    php: "/nginx"
+                    sql: "/mariadb"
+                    certificate: "/certificate"
+            }
+        }
+
+        -- if the host is not defined, this is the same as the parent
+        domain "blog", {
+            service "wordpress", {
+                ldap: "/slapd"
+                php: "/nginx"
+                sql: "/mariadb"
+                certificate: "/certificate"
+            }
+        }
+
+        domain "git", {
+            service "gitea", {
+                ldap: "/slapd"
+                php: "/nginx"
+                sql: "/mariadb"
+                certificate: "/certificate"
+            }
+        }
+    }
 }
 ```
