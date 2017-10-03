@@ -7,6 +7,14 @@ etlua = require "etlua"
 
 Object = require "yunoconfig.configuration.object"
 
+dirname = (filepath) ->
+	name = filepath\gsub "/[^/]*$", ""
+
+	if name == filepath
+		name = "."
+
+	return name
+
 class extends Object
 	new: (name, opt) =>
 		super name, opt
@@ -34,6 +42,8 @@ class extends Object
 				else
 					print "warning: '#{self.name}' has invalid portNumbers for tag '#{tagName}'"
 					print "warning: default ports will be used for service '#{self.name}' and tag '#{tagName}'"
+
+		@createdFiles = {}
 
 	finalize: (context) =>
 		@context = context
@@ -104,7 +114,39 @@ class extends Object
 
 		@\saveCache context
 
-	writeTemplate: (name, destination, environment) =>
+		@\writeYunoBackupFile!
+
+	writeYunoBackupFile: =>
+		os.execute "mkdir -p '#{@context.outputDirectory}/etc/yunobackup'"
+		file = io.open "#{@context.outputDirectory}/etc/yunobackup/yunorock-#{@\getDomainName! or "@"}-#{@name}.moon", "w"
+
+		file\write "{\n"
+		file\write "\tname: 'yunorock-#{@\getDomainName! or "@"}-#{@name}'\n"
+		file\write "\tfiles: {\n"
+		for filepath in *@createdFiles
+			file\write "\t\t'#{filepath}'\n"
+		file\write "\t}\n"
+		file\write "}\n"
+
+		file\close!
+
+	registerCreatedFile: (path, options) =>
+		options or= {}
+
+		unless options.nobackup
+			unless path\match "^/"
+				path = "/" .. path
+
+			for oldEntry in *@createdFiles
+				if path == oldEntry
+					-- duplicate, ignoring.
+					return true
+
+			table.insert @createdFiles, path
+
+	writeTemplate: (name, destination, environment, options) =>
+		@\registerCreatedFile destination, options
+
 		destinationPath = @context.outputDirectory .. "/" .. destination
 
 		do -- Creating the necessary directories.
@@ -158,12 +200,22 @@ class extends Object
 
 		destinationFile\close!
 
-	createDirectory: (relativePath) =>
+	createDirectory: (relativePath, options) =>
+		@\registerCreatedFile ((relativePath .. "/")\gsub "//$", "/"), options
+
 		io.write "   directory: '#{colors.magenta relativePath}'", "\n"
 
 		os.execute "mkdir -p '#{@context.outputDirectory}/#{relativePath}'"
 
-	copy: (source, destination) =>
+	copy: (source, destination, options) =>
+		originalAttributes = lfs.attributes @context.outputDirectory .. "/" .. destination
+		if originalAttributes and originalAttributes.mode == "directory"
+			@\registerCreatedFile (destination .. "/" .. source\gsub ".*/", ""), options
+		else
+			os.execute "mkdir -p '#{@context.outputDirectory}/#{dirname destination}'"
+
+			@\registerCreatedFile destination, options
+
 		io.write "   copy: '#{colors.blue source}' -> '#{colors.white destination}'", "\n"
 		os.execute "cp -r '#{source}' #{@context.outputDirectory}/#{destination}"
 

@@ -10,7 +10,7 @@ service "openrc", {
 
 		os.execute "chmod +x '#{context.outputDirectory}'/#{destination}"
 
-		service\createDirectory "/run/yunorock"
+		service\createDirectory "/run/yunorock", nobackup: true
 }
 
 

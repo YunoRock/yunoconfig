@@ -1,8 +1,13 @@
 
 lfs = require "lfs"
 
+basedir = "/etc/yunorock/ssl"
+
 service "certificates", {
 	provides "certificate", {}
+
+	configure: =>
+		@\createDirectory basedir
 
 	generateCertificate: (domain) =>
 		out = @context.outputDirectory
@@ -12,9 +17,7 @@ service "certificates", {
 		unless domainName
 			return
 
-		basedir = "/etc/yunorock/ssl"
-
-		@\createDirectory basedir
+		@\createDirectory basedir, nobackup: true
 
 		privkey = "#{basedir}/#{domainName}.key"
 		pubkey = "#{basedir}/#{domainName}.pub"
