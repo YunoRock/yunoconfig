@@ -12,9 +12,23 @@ Data formats and available APIs may change at any time.
 ---
 
 This tool is designed to be a common configuration interface for dæmons or applications that depend on each other.
-Its intented goal is to make administrating a server easier for non-power-users, even for servers that serve multiple domains and applications.
+Its intended goal is to make administrating a server easier for non-power-users, even for servers that serve multiple domains and applications.
 
-With it, services are configured as a tree of producers and consumers of services.
+## How it works
+
+Services are configured as a tree of producers and consumers of services.
+A service will produce a tag that will be consumed by another.
+For example: mariadb provides a tag "sql" that will be consumed by every program that needs to perform SQL operations.
+
+Here the different steps to get the job done:
+
+1. install the configuration tool and its dependencies (described below)
+2. install the programs you need, and their configuration templates (ex: mariadb-yunorock)
+3. create a configuration file that describes the interaction between services on your computer
+4. generate configuration files for all your services with it
+5. start your services
+6. ...
+7. profit!
 
 ## Dependencies
 
@@ -141,3 +155,51 @@ The `generate` command (from the tool’s CLI) will generate the configuration.
 moon services.moon generate
 ```
 
+## Current implementation
+
+This project is currently tested on the Alpine Linux distribution, but every part is distribution-agnostic.
+
+### Core system
+
+The whole system relies on several programs:
+
+- configuration generation and templates (yunoconfig)
+- packet manager (apk)
+- service manager (openrc)
+- backups (borg)
+
+That's it. Everything else is optional, and these programs could be changed if you want to (protip: you don't).
+
+### Available services
+
+- nginx (provides: http, www, php)
+- mariadb (provides: sql, mysql)
+- gitea (consumes: sql)
+
+## Approach limitations
+
+Configuring services this way may imply hard to read configuration templates.
+This could be circumvented in different ways, but this is not even a near problem in the current implementation.
+
+## Future
+
+In a near future, here the configuration file you could use:
+```moon
+root {
+	service nginx, {}
+	service mariadb, {}
+
+	domain "example.com:host1", {
+		service "some-php-app", {
+			php: "/nginx"
+		}
+	}
+
+	domain "test.example.com:host2", {
+		service "some-php-app", {
+			php: "/nginx"
+                        sql: "/mariadb"
+		}
+	}
+}
+```
