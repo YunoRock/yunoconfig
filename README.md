@@ -155,9 +155,20 @@ The `generate` command (from the tool’s CLI) will generate the configuration.
 moon services.moon generate
 ```
 
-## Current implementation, Yunorock project
+---
+
+## Yunorock project
 
 This software is part of a bigger project: Yunorock.
+
+The goal is to help you hosting your services at home, without requiring an engineer degree.
+
+Here what we do for you:
+
+* abstract the configuration, the general idea and sane defaults are enough to get you started, configuration files are technical details
+* help configuring complex setups with a debug tool
+* everything is in a simple, readable text file!
+
 The project is currently tested on the Alpine Linux distribution, but every part is distribution-agnostic.
 
 ### Core system
@@ -170,29 +181,57 @@ The whole system relies on several programs:
 - backups: borg
 
 That's it. Everything else is optional, and these programs could be changed if you want to (protip: you don't).
+These software, including the operating system itself, were chosen based on their usability.
+A good rationale is needed to change them.
 
-### Available services
+### Packet management: tools
+
+A new repository for the Alpine Linux distribution is foreseen for this project, to help people host themselves (one of the goals).
+
+### Conventions and principles
+
+File hierarchy:
+
+  - **/var/yunorock/domain-service**: generated configuration files
+  - **/srv/yunorock/domain-service**: service data directory
+  - **/usr/share/yunoconfig**: description files for yunorock services
+    + /templates
+  - **/etc/yunoconfig**: user configuration directory (ex: for template edition)
+    + /templates
+  - **/usr/share/www**: web yunorock appliances directory
+  - **/run/yunorock/domain-service**: openrc runtime, dedicated yunorock files
+  - **/var/cache/yunorock/domain-service**: service runtime cache
+  - **/var/log/yunorock/domain-service**: service logs
+  - **/var/backups/yunorock/domain-service**: backups directory
+
+Yunorock sane principles:
+
+> **Packet management**: every service should be installed using your operating system packaging system, so its dependencies.
+
+__Rationale__: once you introduce new libraries, you introduce new bugs.
+Every time you use a packet manager that is not the one of your operating system (such as npm, pip, cpan, …) you may install new libraries and programs, which are not tested by the maintainers of the OS.
+There is ***no stability at all***. You will end with non reproducible bugs, different bugs from one system to another, and a massive headache.
+Keep it simple: one operating system, one packet manager, one way to install things.
+
+> **Learn how everything works**
+
+__Rationale__: basic components of your system deserve your attention.
+Take your time understanding your OS (packet and service managers, packet content, the different conventions, …) before trying to change it.
+
+> **There is no rush**: building an operating system is a long process, basic blocks and tests come before new features.
+
+__Rationale__: broken templates, or services not following conventions will end-up taking maintainers time.
+So, once you want to push a new packet, you have to test it as much as possible.
+Take. Your. Time. And remember to ask for help if you need it.
+Hard work for the template creation = good user experience.
+
+---
+
+## Current implementation, available services
 
 - nginx (provides: http, www, php)
 - mariadb (provides: sql, mysql)
 - gitea (consumes: http, sql)
-
-### Convention
-
-Here the convention for the file hierarchy:
-
-  - /var/yunorock/<domain>-<service>: generated configuration files
-  - /srv/yunorock/<domain>-<service>: service data directory
-  - /usr/share/yunoconfig: description files for yunorock services
-    - /templates
-  - /etc/yunoconfig : user configuration directory (ex: for templates edition)
-    - /templates
-  - /usr/share/www : web yunorock appliances directory
-  - /run/yunorock/<domain>-<service> : openrc runtime, dedicated yunorock files
-  - /var/cache/yunorock/<domain>-<service> : service runtime cache
-  - /var/log/yunorock/<domain>-<service> : service logs
-  - /var/backups/yunorock/<domain>-<service> : backups directory
-
 
 ## Approach limitations
 
@@ -231,7 +270,7 @@ root {
 
     -- radvd is a program to autoconfigure IPv6 in the LAN
     service radvd, {
-        -- information here cannot be deduced from elsewhere un the configuration
+        -- information here cannot be deduced from elsewhere in the configuration
         iface: "vio0"
         network: "2001:db8:0:1::/64"
     }
