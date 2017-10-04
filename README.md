@@ -11,6 +11,8 @@ Data formats and available APIs may change at any time.
 
 ---
 
+# Yunoconfig
+
 This tool is designed to be a common configuration interface for dæmons or applications that depend on each other.
 Its intended goal is to make administrating a server easier for non-power-users, even for servers that serve multiple domains and applications.
 
@@ -157,17 +159,20 @@ moon services.moon generate
 
 ---
 
-## Yunorock project
+# Yunorock project
 
-This software is part of a bigger project: Yunorock.
+Yunoconfig is part of a bigger project: Yunorock.
 
 The goal is to help you hosting your services at home, without requiring an engineer degree.
 
 Here what we do for you:
 
-* abstract the configuration, the general idea and sane defaults are enough to get you started, configuration files are technical details
-* help configuring complex setups with a debug tool
-* everything is in a simple, readable text file!
+* abstract the configuration, configuration files are technical details
+* configure complex setups with a simple tool
+* … and everything is in a simple, readable text file!
+
+> You only need to know the services you want and the interaction between them.
+The general idea of your final setup and sane defaults are enough to get you started.
 
 The project is currently tested on the Alpine Linux distribution, but every part is distribution-agnostic.
 
@@ -184,9 +189,52 @@ That's it. Everything else is optional, and these programs could be changed if y
 These software, including the operating system itself, were chosen based on their usability.
 A good rationale is needed to change them.
 
-### Packet management: tools
+### Repository
 
-A new repository for the Alpine Linux distribution is foreseen for this project, to help people host themselves (one of the goals).
+> A new repository for the Alpine Linux distribution is foreseen for this project.
+
+__Rationale__: the project aims at providing a sane operating system, with easy-to-install services for a simple home hosting.
+This includes network services, such as DNS, mail, instant messaging, and also web applications, such as blogs or wikis.
+These applications are not always available in your OS repositories.
+Also, they have to be configured by our configuration tool, which implies configuration templates.
+Finally, to avoid negative side effects of multiple packet managers (pip, npm, …), **all dependencies** including language libraries must be provided in the same repository.
+
+> Why the hell you want to package everything? Why is the packaging of libraries your job? Can't the developers or the bare OS do it for you?
+
+__Rationale__: developers cannot provide packets for every OS. Simple.
+If your OS wants it, they have to package it itself.
+Alpine Linux does not provide every available library, nor other Linux distributions, and it's not their job.
+OS tend to provide just enough tools to get you start do whatever you want, they probably won't maintain web applications for instance.
+Yunorock aims at providing ***everything*** you need for hosting your services, including the services and their updates.
+
+Different goals, different people, different repositories, same packaging system.
+
+> Is Docker (or FlatPak, or snap, or whatever) the real solution™?
+
+The goal of these programs may differ, but either way you end up with a "simple to install applications" argument.
+
+__Rationale__: first, there is no silver bullet. Don't fool yourself.
+For the rest:
+
+* Docker implies the developers to control what's going on on your system: they control the configuration, installation and provide a "somewhat usable" interface to use their applications.
+Instead of giving a clear way to install things, this tool provides a way to push the developer's environment.
+This encourages not to care about security, good development practices and documentation.
+Also, this is a hell of more complex than just starting an application, like how we done this in UNIX.
+* Flatpak helps you follow bleeding-edge versions of applications, stability may vary.
+* SNAP is like Flatpak: another packaging system in addition to your OS one.
+
+Finally, most of the problems these applications try to solve come from bad packaging system or management.
+We just don't want to support legacy systems, your OS will be updated regularly.
+Do not worry about having the latest versions of your programs.
+
+Here a simple table with our arguments against the use of these programs:
+
+Software | reason not to use
+-------- | ----------------------------------
+Docker   | complex mechanism to abstract configuration, apps managed by their developers, Linux-centric
+Flatpak  | not oriented towards server applications, apps managed by their developers, Linux-centric
+SNAP     | apps managed by their developers, Linux-centric
+
 
 ### Conventions and principles
 
