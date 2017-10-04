@@ -194,7 +194,7 @@ A good rationale is needed to change them.
 > A new repository for the Alpine Linux distribution is foreseen for this project.
 
 __Rationale__: the project aims at providing a sane operating system, with easy-to-install services for a simple home hosting.
-This includes network services, such as DNS, mail, instant messaging, and also web applications, such as blogs or wikis.
+This includes network services (such as DNS, mail, instant messaging), and also web applications, such as blogs or wikis.
 These applications are not always available in your OS repositories.
 Also, they have to be configured by our configuration tool, which implies configuration templates.
 Finally, to avoid negative side effects of multiple packet managers (pip, npm, â€¦), **all dependencies** including language libraries must be provided in the same repository.
@@ -202,7 +202,7 @@ Finally, to avoid negative side effects of multiple packet managers (pip, npm, â
 > Why the hell you want to package everything? Why is the packaging of libraries your job? Can't the developers or the bare OS do it for you?
 
 __Rationale__: developers cannot provide packets for every OS. Simple.
-If your OS wants it, they have to package it itself.
+If your OS wants an application, maintainers have to package it themselves.
 Alpine Linux does not provide every available library, nor other Linux distributions, and it's not their job.
 OS tend to provide just enough tools to get you start do whatever you want, they probably won't maintain web applications for instance.
 Yunorock aims at providing ***everything*** you need for hosting your services, including the services and their updates.
@@ -217,15 +217,20 @@ __Rationale__: first, there is no silver bullet. Don't fool yourself.
 For the rest:
 
 * Docker implies the developers to control what's going on on your system: they control the configuration, installation and provide a "somewhat usable" interface to use their applications.
-Instead of giving a clear way to install things, this tool provides a way to push the developer's environment.
+Instead of giving a clear way to install things, this tool gives developers a way to push their own environment into your system.
 This encourages not to care about security, good development practices and documentation.
-Also, this is a hell of more complex than just starting an application, like how we done this in UNIX.
+Also, this is a hell of more complex than just starting an application.
+We do not deny any positive points, but Docker is not the way we want to achieve our goal.
 * Flatpak helps you follow bleeding-edge versions of applications, stability may vary.
 * SNAP is like Flatpak: another packaging system in addition to your OS one.
 
 Finally, most of the problems these applications try to solve come from bad packaging system or management.
 We just don't want to support legacy systems, your OS will be updated regularly.
 Do not worry about having the latest versions of your programs.
+
+> Sane principle: rely on the fewest components. They have to be simple.
+A kernel, a simple init, a simple service management that mostly only keep track of the PID of your service, services that only read their configuration files, work on few defined directories, write simple logs in text files and may have a database.
+That is simplicity.
 
 Here a simple table with our arguments against the use of these programs:
 
@@ -235,24 +240,7 @@ Docker   | complex mechanism to abstract configuration, apps managed by their de
 Flatpak  | not oriented towards server applications, apps managed by their developers, Linux-centric
 SNAP     | apps managed by their developers, Linux-centric
 
-
-### Conventions and principles
-
-File hierarchy:
-
-  - **/var/yunorock/domain-service**: generated configuration files
-  - **/srv/yunorock/domain-service**: service data directory
-  - **/usr/share/yunoconfig**: description files for yunorock services
-    + /templates
-  - **/etc/yunoconfig**: user configuration directory (ex: for template edition)
-    + /templates
-  - **/usr/share/www**: web yunorock appliances directory
-  - **/run/yunorock/domain-service**: openrc runtime, dedicated yunorock files
-  - **/var/cache/yunorock/domain-service**: service runtime cache
-  - **/var/log/yunorock/domain-service**: service logs
-  - **/var/backups/yunorock/domain-service**: backups directory
-
-Yunorock sane principles:
+## Yunorock sane principles
 
 > **Packet management**: every service should be installed using your operating system packaging system, so its dependencies.
 
@@ -272,6 +260,28 @@ __Rationale__: broken templates, or services not following conventions will end-
 So, once you want to push a new packet, you have to test it as much as possible.
 Take. Your. Time. And remember to ask for help if you need it.
 Hard work for the template creation = good user experience.
+
+---
+
+# Packaging: PKG++
+
+[Here the recipes of Yunorock][recipes]
+
+### Conventions and principles
+
+File hierarchy:
+
+  - **/var/yunorock/domain-service**: generated configuration files
+  - **/srv/yunorock/domain-service**: service data directory
+  - **/usr/share/yunoconfig**: description files for yunorock services
+    + /templates
+  - **/etc/yunoconfig**: user configuration directory (ex: for template edition)
+    + /templates
+  - **/usr/share/www**: web yunorock appliances directory
+  - **/run/yunorock/domain-service**: openrc runtime, dedicated yunorock files
+  - **/var/cache/yunorock/domain-service**: service runtime cache
+  - **/var/log/yunorock/domain-service**: service logs
+  - **/var/backups/yunorock/domain-service**: backups directory
 
 ---
 
@@ -407,3 +417,5 @@ root {
     }
 }
 ```
+
+[recipes]: https://github.com/YunoRock/yunorock-recipes
