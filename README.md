@@ -229,10 +229,10 @@ We just don't want to support legacy systems, your OS will be updated regularly.
 Do not worry about having the latest versions of your programs.
 
 > Sane principle: rely on the fewest components. They have to be simple.
-A kernel, a simple init, a simple service management that mostly only keep track of the PID of your service, services that only read their configuration files, work on few defined directories, write simple logs in text files and may have a database.
+A kernel, a simple init, a simple service management that almost only keeps track of the PID of your service, services that only read their configuration files, work on few defined directories, write simple logs in text files and may have a database.
 That is simplicity.
 
-Here a simple table with our arguments against the use of these programs:
+Here a table with our reasons not to use these programs:
 
 Software | reason not to use
 -------- | ----------------------------------
@@ -260,6 +260,11 @@ __Rationale__: broken templates, or services not following conventions will end-
 So, once you want to push a new packet, you have to test it as much as possible.
 Take. Your. Time. And remember to ask for help if you need it.
 Hard work for the template creation = good user experience.
+
+> **Portability should be taken into account**: write portable templates.
+
+__Rationale__: portability helps to change OS if necessary (one day Alpine may become bloated) or to adapt our project on another OS (hello BSD guys) if people are interested in doing so.
+Also, at some point we may want to manage many servers with our tool, and we do not want to require a specific OS.
 
 ---
 
