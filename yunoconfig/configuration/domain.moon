@@ -44,11 +44,15 @@ class extends Object
 			return if @parent
 				@parent\getHost!
 			else
-				nil
+				@context.definedHosts[1]
 
 		for host in *@context.definedHosts
 			if host.name == @host
 				return host
+
+	finalize: (context) =>
+		@context = context
+		super\finalize context
 
 	__tostring: =>
 		"<configuration.domain: #{@name}>"

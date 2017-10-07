@@ -1,0 +1,16 @@
+# nsd.conf
+
+remote-control:
+        control-enable: yes
+
+server:
+        hide-version: yes
+		<% for _, ip in ipairs (service:getHost().addresses or {}) do %>
+		ip-address: <%-ip:gsub ("/*", "")%>
+		<% end %>
+
+<% for _, subDomain in ipairs (subDomains) do %>
+zone:
+        name: <%-subDomain:getDomainName() %>
+        zonefile: "master/<%-subDomain:getDomainName() %>.zone"
+<% end %>

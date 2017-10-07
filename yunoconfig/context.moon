@@ -18,7 +18,11 @@ class
 		@servicesManager = opt.servicesManager or "openrc"
 
 		@definedServices = {}
-		@definedHosts = {}
+		@definedHosts = {
+			Host "localhost", {
+				addresses: { "127.0.0.1/8", "::1/128" }
+			}
+		}
 
 		@allCachedPorts = {}
 		@lastLocalPortUsed = 6666 - 1
