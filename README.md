@@ -9,10 +9,30 @@ Most of the data are there for testing and demonstration purposes.
 Both tool, template and other scripts in this repository are still far from being completely ready for practical usage.
 Data formats and available APIs may change at any time.
 
+If you are interested in Yunorock, the operating system, [check this][yunorock].
+
 ---
 
+# Yunoconfig
+
 This tool is designed to be a common configuration interface for dæmons or applications that depend on each other.
-Its intented goal is to make administrating a server easier for non-power-users, even for servers that serve multiple domains and applications.
+Its intended goal is to make administrating a server easier for non-power-users, even for servers that serve multiple domains and applications.
+
+## How it works
+
+Services are configured as a tree of producers and consumers of services.
+A service will produce a tag that will be consumed by another.
+For example: mariadb provides a tag "sql" that will be consumed by every program that needs to perform SQL operations.
+
+Here the different steps to get the job done:
+
+1. install the configuration tool and its dependencies (described below)
+2. install the programs you need, and their configuration templates (ex: mariadb-yunorock)
+3. create a configuration file that describes the interaction between services on your computer
+4. generate configuration files for all your services with it
+5. start your services
+6. ...
+7. profit!
 
 With it, services are configured as a tree of producers and consumers of services.
 
@@ -128,7 +148,7 @@ A `print` command is available from the tool’s CLI.
 This command prints the tree of domains and services, as well as their status and possible reason for failing.
 
 ```sh
-moon services.moon print
+moon yunoconfig.moon print
 ```
 
 Because each service requirement can be misconfigured for a different reason, they are all printed with their respective status as well.
@@ -138,6 +158,7 @@ Because each service requirement can be misconfigured for a different reason, th
 The `generate` command (from the tool’s CLI) will generate the configuration.
 
 ```sh
-moon services.moon generate
+moon yunoconfig.moon generate
 ```
 
+[yunorock]: https://github.com/YunoRock/yunorock-doc
