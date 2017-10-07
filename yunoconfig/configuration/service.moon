@@ -126,6 +126,13 @@ class extends Object
 		for filepath in *@createdFiles
 			file\write "\t\t'#{filepath}'\n"
 		file\write "\t}\n"
+
+		if @definition.exports
+			file\write "\tscripts: {\n"
+			for script in *@definition.exports self, @context
+				file\write "\t\t\"#{script}\"\n"
+			file\write "\t}\n"
+
 		file\write "}\n"
 
 		file\close!

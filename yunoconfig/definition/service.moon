@@ -12,6 +12,8 @@ class
 		@consumedTags = {}
 		@providedTags = {}
 
+		@exports = opt.exports or nil
+
 		for i = 1, #opt
 			child = opt[i]
 
