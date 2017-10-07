@@ -6,6 +6,7 @@ lfs = require "lfs"
 
 ServiceDefinition = require("yunoconfig.definition.service")
 ConfigurationService = require("yunoconfig.configuration.service")
+Host = require("yunoconfig.configuration.host")
 
 class
 	new: (opt) =>
@@ -17,6 +18,7 @@ class
 		@servicesManager = opt.servicesManager or "openrc"
 
 		@definedServices = {}
+		@definedHosts = {}
 
 		@allCachedPorts = {}
 		@lastLocalPortUsed = 6666 - 1
@@ -103,6 +105,8 @@ class
 					os.exit 1
 
 				ConfigurationService name, opt
+			host: (name, opt) ->
+				table.insert @definedHosts, Host name, opt
 		}
 
 		@configuration = f!
