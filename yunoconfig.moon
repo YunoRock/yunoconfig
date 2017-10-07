@@ -5,7 +5,7 @@ argparse = require "argparse"
 Context = require "yunoconfig.context"
 
 arg = do
-	parser = with argparse "yunoconfig", "Centralized configuiration management tool."
+	parser = with argparse "yunoconfig", "Centralized configuration management tool."
 		\command "print",    "Prints the current configuration tree."
 		\command "generate", "Generates the configuration files for all the registered services."
 		\command "print-services", "Prints a list of available and configurable services."
