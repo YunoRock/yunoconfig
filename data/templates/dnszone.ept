@@ -1,6 +1,6 @@
 $TTL    3600
 
-@       IN      SOA     ns0.<%-topLevelDomain%>. root.<%-topLevelDomain%>. (
+@       IN      SOA     ns0.<%-topLevelDomain:getDomainName()%>. root.<%-topLevelDomain:getDomainName()%>. (
                         <%-serial%>     ; Serial
                         3600            ; Refresh [1h]
                         60              ; Retry   [1m]
@@ -8,7 +8,7 @@ $TTL    3600
                         600 )           ; Negative Cache TTL [1h]
 
 <% for _, address in ipairs (topLevelDomain:getHost().addresses or {}) do %>
-	<% address = address:gsub ('/*', '') %>
+	<% address = address:gsub ('/.*', '') %>
 	<% if address:match('%.') then %>
 @               IN      A       <%-address%>
 ns0             IN      A       <%-address%>
@@ -21,7 +21,7 @@ ns0             IN      AAAA    <%-address%>
 ; domains
 <% for _, domain in ipairs (subDomains or {}) do %>
 	<% for _, address in ipairs (domain:getHost().addresses or {}) do %>
-		<% address = address:gsub ('/*', '') %>
+		<% address = address:gsub ('/.*', '') %>
 		<% if address:match('%.') then %>
 <%-domain:getDomainName()%> IN      A       <%-address%>
 		<% else %>

@@ -31,10 +31,10 @@ fi
 		-- 
 		topLevelDomains = context.configuration.domains
 
-		searchTLD = (node, callback) =>
+		searchTLD = (node, callback) ->
 			for domain in *node.domains
 				callback domain
-				searchTLD domain
+				searchTLD domain, callback
 
 		for domain in *topLevelDomains
 			subDomains = {}
@@ -50,6 +50,7 @@ fi
 		configDir = "/var/share/yunoconfig/#{@\getDomainName! or "@"}/"
 		configFile = "#{configDir}/nsd.cfg"
 		@\writeTemplate "nsd", configFile, {
+			service: self
 			:topLevelDomains
 		}
 }

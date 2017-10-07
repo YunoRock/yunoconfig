@@ -5,12 +5,11 @@ remote-control:
 
 server:
         hide-version: yes
-		<% for _, ip in ipairs (service:getHost().addresses or {}) do %>
-		ip-address: <%-ip:gsub ("/*", "")%>
-		<% end %>
+		ip-address: 0.0.0.0
+		ip-address: ::
 
-<% for _, subDomain in ipairs (subDomains) do %>
+<% for _, domain in ipairs (topLevelDomains or {}) do %>
 zone:
-        name: <%-subDomain:getDomainName() %>
-        zonefile: "master/<%-subDomain:getDomainName() %>.zone"
+        name: <%-domain:getDomainName() %>
+        zonefile: "master/<%-domain:getDomainName() %>.zone"
 <% end %>
