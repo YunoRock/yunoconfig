@@ -33,7 +33,8 @@ done
 
 dist=(
 	# Code
-	**/*.moon
+	yunoconfig.moon
+	yunoconfig/**.moon
 	# Build system.
 	project.zsh Makefile
 	# Documentation
