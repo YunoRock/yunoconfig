@@ -111,12 +111,18 @@ class
 
 		@configuration
 
-	registerPort: (number, application) =>
+	registerPort: (number, service) =>
+		for {number: n, service: s} in *@allUsedPorts
+			if number == n
+				return false
+
 		table.insert @allUsedPorts, {
-			:number, :application
+			:number, :service
 		}
 
-	getFreeLocalPortNumber: =>
+		true
+
+	getFreeLocalPortNumber: (service) =>
 		while true
 			@lastLocalPortUsed += 1
 
@@ -128,6 +134,10 @@ class
 					break
 
 			if portIsFree
+				@\registerPort
+					number: @lastLocalPortUsed
+					:service
+
 				return @lastLocalPortUsed
 
 	print: =>

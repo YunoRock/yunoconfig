@@ -23,6 +23,9 @@ class extends Object
 
 		@definition = opt.definition
 
+		-- Errors storage.
+		@brokenness = {}
+
 		---
 		-- Stores the ids of the services that provide the tags we consume.
 		-- Keys are tag names.
@@ -58,30 +61,54 @@ class extends Object
 		if @definition.configure
 			@definition.configure self
 
+		if not @\isBroken!
+			for tag, providerId in pairs @tagProviders
+				provider = @\getServiceById providerId
+
+				if provider\isBroken!
+					table.insert @brokenness, "provider '#{providerId}' is broken"
+
 	requestInternalPorts: (portsName, amount = 1) =>
 		@portNumbers[portsName] or= {}
 
 		cachedPorts = @cache.portNumbers[portsName] or {}
 
 		for i = 1, amount
-			port = cachedPorts[i]
-			unless port
-				port = @context\getFreeLocalPortNumber!
+			-- User-configured value.
+			configurationNumber = @portNumbers[portsName][i]
+			cachedNumber = cachedPorts[i]
 
-			@portNumbers[portsName][i] or= port
+			port = configurationNumber or cachedNumber or @context\getFreeLocalPortNumber!
+
+			unless @context\registerPort port, self
+				table.insert @brokenness, "port '#{port}' is already used"
+				return false
+
+			@portNumbers[portsName][i] = port
+
+		true
 
 	requestPublicPorts: (portsName, numbers) =>
 		@portNumbers[portsName] or= {}
 
 		for index, number in ipairs numbers
 			-- Already cached or user-defined.
-			if @portNumbers[portsName][index]
-				continue
+			oldNumber = @portNumbers[portsName][index]
+			if oldNumber
+				if not @context\registerPort oldNumber, self
+					table.insert @brokenness, "port '#{port}' is already used"
+					return false
+				else
+					continue
 
-			if false
-				continue
+			unless @context\registerPort number, self
+				table.insert @brokenness,
+					"port '#{number}' is already used"
+				return false
 
 			@portNumbers[portsName][index] = number
+
+			true
 
 	getCacheFilePath: (context) =>
 		table.concat {
@@ -126,6 +153,10 @@ class extends Object
 		file\close!
 
 	generate: (context) =>
+		if @\isBroken!
+			print "<#{colors.red @\getId!}> -- BROKEN"
+			return
+
 		print "<#{colors.cyan @\getId!}>"
 
 		if @definition.generate
@@ -271,6 +302,9 @@ class extends Object
 			for domain in @parent\subdomains!
 				for service in *domain.services
 					if service.tagProviders[name] == @\getId!
+						if service\isBroken!
+							continue
+
 						table.insert consumers, service
 
 		consumers
@@ -288,7 +322,14 @@ class extends Object
 
 	print: (indentLevel = 0) =>
 		@\printIndent indentLevel
-		io.write "service: ", (colors.bright colors.white self.name), "\n"
+		io.write "service: ", (colors.bright colors.white self.name)
+
+		if @\isBroken!
+			io.write "  -- BROKEN: "
+
+			io.write table.concat @brokenness, ", "
+
+		io.write "\n"
 
 		for tag in *@definition.consumedTags
 			@\printIndent indentLevel
@@ -344,6 +385,8 @@ class extends Object
 
 	getServiceById: (id) =>
 		@\getConfigurationRoot!\getServiceById id
+
+	isBroken: => #@brokenness > 0
 
 	__tostring: =>
 		"<configuration.service: #{@name} on #{@\getDomainName! or "@"}>"
