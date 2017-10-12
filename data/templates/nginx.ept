@@ -118,8 +118,8 @@ http {
 
 
 		server {
-			listen       <%- service.portNumbers["http"][2] %>;
-			listen       [::]:<%- service.portNumbers["http"][2] %>;
+			listen       <%- service.portNumbers["https"][1] %>;
+			listen       [::]:<%- service.portNumbers["https"][1] %>;
 			server_name  <%-user:getDomainName()%>;
 
 			ssl                  on;

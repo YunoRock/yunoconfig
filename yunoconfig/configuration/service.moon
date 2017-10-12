@@ -55,9 +55,33 @@ class extends Object
 			portNumbers: {}
 		}
 
-		for tag in *@definition.consumedTags
-			@portNumbers[tag.name] or= @cache.portNumbers[tag.name]
-			@portNumbers[tag.name] or= [context\getFreeLocalPortNumber! for port in *tag.publicPorts]
+		if @definition.configure
+			@definition.configure self
+
+	requestInternalPorts: (portsName, amount = 1) =>
+		@portNumbers[portsName] or= {}
+
+		cachedPorts = @cache.portNumbers[portsName] or {}
+
+		for i = 1, amount
+			port = cachedPorts[i]
+			unless port
+				port = @context\getFreeLocalPortNumber!
+
+			@portNumbers[portsName][i] or= port
+
+	requestPublicPorts: (portsName, numbers) =>
+		@portNumbers[portsName] or= {}
+
+		for index, number in ipairs numbers
+			-- Already cached or user-defined.
+			if @portNumbers[portsName][index]
+				continue
+
+			if false
+				continue
+
+			@portNumbers[portsName][index] = number
 
 	getCacheFilePath: (context) =>
 		table.concat {
@@ -282,10 +306,6 @@ class extends Object
 			else
 				io.write "  not provided, not needed"
 
-			ports = [colors.white number for number in *@portNumbers[tag.name]]
-			if #ports > 0
-				io.write "  <ports: ", table.concat(ports, ", "), ">"
-
 			io.write "\n"
 
 		for tag in *@definition.providedTags
@@ -299,6 +319,16 @@ class extends Object
 			else
 				io.write "  not consumed"
 
+			io.write "\n"
+
+
+		ports = [{:name, :numbers} for name, numbers in pairs @portNumbers]
+		table.sort ports, (a, b) -> a.name < b.name
+
+		for port in *ports
+			@\printIndent indentLevel
+			io.write "  #{port.name} port(s): "
+			io.write table.concat(port.numbers, ", ")
 			io.write "\n"
 
 	providesTag: (name) =>

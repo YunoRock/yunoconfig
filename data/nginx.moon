@@ -5,11 +5,18 @@ service "nginx", {
 	provides "php", {}
 	consumes "http", {
 		optional: true
-		publicPorts: {80, 443}
+	--	publicPorts: {80, 443}
 	}
 	consumes "certificate", {
 		optional: true
 	}
+
+	configure: =>
+		if @tagProviders.http
+			@\requestInternalPorts "http"
+		else
+			@\requestPublicPorts "http",  {80}
+			@\requestPublicPorts "https", {443}
 
 	service: (context) =>
 		configFile = "/etc/yunorock/#{@\getDomainName! or "@"}/nginx.cfg"

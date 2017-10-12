@@ -20,7 +20,7 @@ class
 		@definedServices = {}
 		@definedHosts = {}
 
-		@allCachedPorts = {}
+		@allUsedPorts = {}
 		@lastLocalPortUsed = 6666 - 1
 
 		@templatesLoadPath = opt.templatesLoadPath or "/etc/yunoconfig/templates/?.lua"
@@ -47,10 +47,6 @@ class
 				_, data = serpent.load file\read "*all"
 
 				file\close!
-
-				for tagName, ports in pairs(data.portNumbers or {})
-					for port in *ports
-						@allCachedPorts[#@allCachedPorts+1] = port
 
 	importServices: =>
 		for entry in lfs.dir @servicesDirectory
@@ -115,13 +111,18 @@ class
 
 		@configuration
 
+	registerPort: (number, application) =>
+		table.insert @allUsedPorts, {
+			:number, :application
+		}
+
 	getFreeLocalPortNumber: =>
 		while true
 			@lastLocalPortUsed += 1
 
 			portIsFree = true
-			for port in *@allCachedPorts
-				if port == @lastLocalPortUsed
+			for port in *@allUsedPorts
+				if port.number == @lastLocalPortUsed
 					portIsFree = false
 
 					break
