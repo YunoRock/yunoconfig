@@ -103,6 +103,8 @@ class
 				ConfigurationService name, opt
 			host: (name, opt) ->
 				table.insert @definedHosts, Host name, opt
+			gateway: (gate) ->
+				@gateway = gate
 		}
 
 		@configuration = f!
@@ -141,6 +143,9 @@ class
 				return @lastLocalPortUsed
 
 	print: =>
+		for host in *@definedHosts
+			host\print!
+
 		@configuration\print!
 
 	generate: =>

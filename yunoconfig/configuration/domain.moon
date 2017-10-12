@@ -9,6 +9,7 @@ class extends Object
 
 		@domains = {}
 		@services = {}
+		@host = opt.host or nil
 
 		for i = 1, #opt
 			child = opt[i]
@@ -37,6 +38,17 @@ class extends Object
 			for domain in *@domains
 				for domain in domain\subdomains!
 					coroutine.yield domain
+
+	getHost: =>
+		unless @host
+			return if @parent
+				@parent\getHost!
+			else
+				nil
+
+		for host in *@context.definedHosts
+			if host.name == @host
+				return host
 
 	__tostring: =>
 		"<configuration.domain: #{@name}>"
