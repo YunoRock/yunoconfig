@@ -2,7 +2,7 @@
 service "ip-php", {
 	consumes "php", {}
 
-	configure: (context) =>
+	generate: (context) =>
 		originDirectory = "./data"
 		destinationDirectory = "/srv/www/#{@\getDomainName! or "@"}"
 

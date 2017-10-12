@@ -6,7 +6,7 @@ basedir = "/etc/yunorock/ssl"
 service "certificates", {
 	provides "certificate", {}
 
-	configure: =>
+	generate: =>
 		@\createDirectory basedir
 
 	generateCertificate: (domain) =>

@@ -28,7 +28,7 @@ service "nginx", {
 			:after
 		}
 
-	configure: =>
+	generate: =>
 		configFile = "/etc/yunorock/#{@\getDomainName! or "@"}/nginx.cfg"
 		@\writeTemplate "nginx", configFile
 }

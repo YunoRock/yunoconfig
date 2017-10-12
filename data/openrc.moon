@@ -1,6 +1,6 @@
 
 service "openrc", {
-	configure: (context, service, data) =>
+	generate: (context, service, data) =>
 		destination = "etc/init.d/services-#{service\getDomainName! or '@'}.#{service.name}"
 
 		service\writeTemplate "openrc", destination, {

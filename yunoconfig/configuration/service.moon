@@ -104,13 +104,13 @@ class extends Object
 	generate: (context) =>
 		print "<#{colors.cyan @\getId!}>"
 
-		if @definition.configure
-			@definition.configure self, context
+		if @definition.generate
+			@definition.generate self, context
 
 		if @definition.service
 			serviceData = @definition.service self, context
 
-			context.definedServices[context.servicesManager]\configure context, self, serviceData
+			context.definedServices[context.servicesManager]\generate context, self, serviceData
 
 		@\saveCache context
 
