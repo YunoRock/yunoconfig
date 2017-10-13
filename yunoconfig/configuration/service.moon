@@ -65,7 +65,9 @@ class extends Object
 			for tag, providerId in pairs @tagProviders
 				provider = @\getServiceById providerId
 
-				if provider\isBroken!
+				unless provider
+					table.insert @brokenness, "provider '#{providerId}' does not exist"
+				else if provider\isBroken!
 					table.insert @brokenness, "provider '#{providerId}' is broken"
 
 	requestInternalPorts: (portsName, amount = 1) =>
