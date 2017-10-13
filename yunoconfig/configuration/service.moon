@@ -327,9 +327,9 @@ class extends Object
 		io.write "service: ", (colors.bright colors.white self.name)
 
 		if @\isBroken!
-			io.write "  -- BROKEN: "
+			io.write colors.white("  --"), colors.red(" BROKEN: ")
 
-			io.write table.concat @brokenness, ", "
+			io.write table.concat [colors.red str for str in *@brokenness], ", "
 
 		io.write "\n"
 
