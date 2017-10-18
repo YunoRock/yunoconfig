@@ -13,7 +13,7 @@ filename[yunoconfig.moon]="yunoconfig"
 for i in yunoconfig/**/*.moon; do
 	targets+=($i)
 	type[$i]="script"
-	install[$i]='$(SHAREDIR)/lua/$(LUA_VERSION)/yunoconfig'
+	install[$i]='$(SHAREDIR)/lua/$(LUA_VERSION)/'"${i%/*}"
 	auto[$i]=true # Hidden from `make help`
 done
 
