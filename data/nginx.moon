@@ -20,19 +20,19 @@ service "nginx", {
 
 	service: (context) =>
 		configFile = "/etc/yunorock/#{@\getDomainName! or "@"}/nginx.cfg"
-		after = {"networking", "dns", "logger", "netmount"}
+		need = {"networking"}
+		use = {"dns", "logger", "netmount"}
 
 		if #@\getConsumers("php") > 0
-			table.insert after, "php-fpm"
+			table.insert need, "php-fpm"
 
 		{
-			start: "nginx -c #{configFile}"
+			command: "nginx"
+			commandArguments: {"-c", configFile}
 			preStart: "nginx -t -c #{configFile}"
 			reload: "signal:HUP"
-			-- Default handler.
-			--stop: "signal:TERM"
 			requiredFiles: {configFile}
-			:after
+			:need, :after, :use
 		}
 
 	generate: =>

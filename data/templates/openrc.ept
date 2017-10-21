@@ -1,55 +1,38 @@
 #!/sbin/openrc-run
 
-description="<%-data.description or (service.name .. " running on " .. (service:getDomainName() or "@"))%>"
-extra_started_commands="<%if data.reload then%> reload<%end%>"
+command="<%- command %>"
+<% if commandArguments then %>
+command_args="<%- table.concat(commandArguments, " ") %>"
+<% end %>
+<% if commandUser then %>
+command_user="<%- commandUser %>"
+<% end %>
+pidfile="<%- pidfile %>"
 
-pidfile=/run/yunorock/<%-service:getDomainName() or "@"%>-<%-service.name%>.pid
-required_files="<%-table.concat(data.requiredFiles or {}, " ")%>"
+<% if needsBackground then %>
+command_background="yes"
+<% end %>
+
+<% if startStopDaemonArguments then %>
+start_stop_daemon_args="<%- startStopDaemonArguments %>"
+<% end %>
+
+<% if reload then %>
+extra_started_commnands="reload"
+<% end %>
 
 depend() {
-	after<%for _, depend in ipairs(data.after or {}) do%> <%-depend%><%end%>
+	use     <% for _, dep in ipairs(use or {}) do %> <%- dep %><% end %>
+	need    <% for _, dep in ipairs(need or {}) do %> <%- dep %><% end %>
+	after   <% for _, dep in ipairs(after or {}) do %> <%- dep %><% end %>
+	before  <% for _, dep in ipairs(before or {}) do %> <%- dep %><% end %>
 }
 
-<%if data.preStart then%>
-start_pre() {
-	ebegin
-	<%-data.preStart%>
-	eend $?
-}
-<%end%>
-
-<%if data.start then%>
-start() {
-	ebegin "Starting ${SVCNAME}"
-	start-stop-daemon --background --start --exec $(which <%-data.start:gsub("%s.*", "")%>) \
-		--make-pidfile --pidfile $pidfile -- \
-		<%-data.start:gsub("^[^ ]*%s+", "")%>
-	eend $?
-}
-<%end%>
-
-<%if data.stop then%>
-stop() {
-	ebegin "Stopping ${SVCNAME}"
-	<%if data.stop:gsub(":.*", "") == "signal" then%>
-	start-stop-daemon --stop --signal <%-data.stop:gsub("^signal:", "")%> --pidfile $pidfile
-	<%else%>
-	<%-data.stop%>
-	<%end%>
-	eend $?
-}
-<%end%>
-
-<%if data.reload then%>
+<% if reload then %>
 reload() {
-	ebegin "Reloading ${SVCNAME} configuration"
-	<%if data.reload:gsub(":.*", "") == "signal" then%>
-	<%if data.preStart then %><%-data.preStart%> && \
-		<%end%>start-stop-daemon --signal <%-data.reload:gsub("^signal:", "")%> --pidfile $pidfile
-	<%else%>
-	<%-data.reload%>
-	<%end%>
+	ebegin "Reloading $RC_SVCNAME configuration"
+	<%- reload %>
 	eend $?
 }
-<%end%>
+<% end %>
 
