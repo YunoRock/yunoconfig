@@ -65,7 +65,9 @@ class extends Object
 			for tag, providerId in pairs @tagProviders
 				provider = @\getServiceById providerId
 
-				if provider\isBroken!
+				unless provider
+					table.insert @brokenness, "provider '#{providerId}' does not exist"
+				else if provider\isBroken!
 					table.insert @brokenness, "provider '#{providerId}' is broken"
 
 	requestInternalPorts: (portsName, amount = 1) =>
@@ -325,9 +327,9 @@ class extends Object
 		io.write "service: ", (colors.bright colors.white self.name)
 
 		if @\isBroken!
-			io.write "  -- BROKEN: "
+			io.write colors.white("  --"), colors.red(" BROKEN: ")
 
-			io.write table.concat @brokenness, ", "
+			io.write table.concat [colors.red str for str in *@brokenness], ", "
 
 		io.write "\n"
 
