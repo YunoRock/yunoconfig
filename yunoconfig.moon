@@ -12,7 +12,9 @@ arg = do
 
 		with \option "-r --root",  "Sets the root of the configuration tree.", "/"
 			\count 1
-		with \option "-c --cache", "Sets the path to the cache used to generate the configuration.", "/var/cache/yunoconfig"
+		with \option "-C --cache", "Sets the path to the cache used to generate the configuration.", "/var/cache/yunoconfig"
+			\count 1
+		with \option "-c --config --config-file", "Sets the path to the configuration file.", "/etc/yunoconfig.cfg"
 			\count 1
 		with \option "-S --services-dir", "Sets the path to the directory containing the service definition files.", "/usr/share/yunoconfig"
 			\count 1
@@ -31,7 +33,7 @@ with Context!
 			print service
 		os.exit 0
 
-	\importConfiguration!
+	\importConfiguration arg.config
 
 	if arg.print
 		\print!
