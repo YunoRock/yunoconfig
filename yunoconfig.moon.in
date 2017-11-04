@@ -16,7 +16,7 @@ arg = do
 			\count 1
 		with \option "-c --config --config-file", "Sets the path to the configuration file.", "/etc/yunoconfig.cfg"
 			\count 1
-		with \option "-S --services-dir", "Sets the path to the directory containing the service definition files.", "/usr/share/yunoconfig"
+		with \option "-S --services-dir", "Sets the path to the directory containing the service definition files.", "@SHAREDIR@/yunoconfig"
 			\count 1
 
 	parser\parse!
