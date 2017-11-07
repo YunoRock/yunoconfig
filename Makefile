@@ -333,8 +333,7 @@ uninstall: subdirs.uninstall yunoconfig.moon.uninstall yunoconfig/configuration/
 subdirs.uninstall:
 
 test: all subdirs subdirs.test
-	@:
-
+	$(Q)busted
 subdirs.test:
 
 clean: yunoconfig.moon.clean yunoconfig/configuration/domain.moon.clean yunoconfig/configuration/host.moon.clean yunoconfig/configuration.moon.clean yunoconfig/configuration/object.moon.clean yunoconfig/configuration/root.moon.clean yunoconfig/configuration/service.moon.clean yunoconfig/context.moon.clean yunoconfig/definition/consumes.moon.clean yunoconfig/definition/provides.moon.clean yunoconfig/definition/service.moon.clean data/certificates.moon.clean data/ip-php.moon.clean data/nginx.moon.clean data/openrc.moon.clean data/slapd.moon.clean data/test-app.moon.clean data/www.moon.clean data/templates/nginx.ept.clean data/templates/openrc.ept.clean doc/yunoconfig.1.clean
@@ -374,6 +373,8 @@ $(PACKAGE)-$(VERSION).tar.gz: distdir
 		$(PACKAGE)-$(VERSION)/project.zsh \
 		$(PACKAGE)-$(VERSION)/Makefile \
 		$(PACKAGE)-$(VERSION)/README.md \
+		$(PACKAGE)-$(VERSION)/spec/yunoconfig.moon \
+		$(PACKAGE)-$(VERSION)/spec/data/example.conf \
 		$(PACKAGE)-$(VERSION)/doc/yunoconfig.1.md \
 		$(PACKAGE)-$(VERSION)/yunoconfig.moon.in
 
@@ -403,6 +404,8 @@ $(PACKAGE)-$(VERSION).tar.xz: distdir
 		$(PACKAGE)-$(VERSION)/project.zsh \
 		$(PACKAGE)-$(VERSION)/Makefile \
 		$(PACKAGE)-$(VERSION)/README.md \
+		$(PACKAGE)-$(VERSION)/spec/yunoconfig.moon \
+		$(PACKAGE)-$(VERSION)/spec/data/example.conf \
 		$(PACKAGE)-$(VERSION)/doc/yunoconfig.1.md \
 		$(PACKAGE)-$(VERSION)/yunoconfig.moon.in
 
@@ -432,6 +435,8 @@ $(PACKAGE)-$(VERSION).tar.bz2: distdir
 		$(PACKAGE)-$(VERSION)/project.zsh \
 		$(PACKAGE)-$(VERSION)/Makefile \
 		$(PACKAGE)-$(VERSION)/README.md \
+		$(PACKAGE)-$(VERSION)/spec/yunoconfig.moon \
+		$(PACKAGE)-$(VERSION)/spec/data/example.conf \
 		$(PACKAGE)-$(VERSION)/doc/yunoconfig.1.md \
 		$(PACKAGE)-$(VERSION)/yunoconfig.moon.in
 

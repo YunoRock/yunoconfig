@@ -37,6 +37,10 @@ for i in doc/*.[0-9].md; do
 	sources[${i%.md}]="${i}"
 done
 
+tests=(
+	"busted"
+)
+
 dist=(
 	# Code
 	yunoconfig/**/*.moon
@@ -46,6 +50,8 @@ dist=(
 	project.zsh Makefile
 	# Documentation
 	README.md
+	# Tests
+	spec/**/*.moon
+	spec/data/*.conf
 )
-
 

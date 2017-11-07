@@ -149,6 +149,9 @@ class
 		@configuration\print!
 
 	generate: =>
+		unless @configuration
+			error "tried to generate before setting configuration"
+
 		@configuration\generate self
 
 	__tostring: => "<configuration.context>"
